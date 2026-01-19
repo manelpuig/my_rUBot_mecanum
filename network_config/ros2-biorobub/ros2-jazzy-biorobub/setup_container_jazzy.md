@@ -11,14 +11,13 @@
     ````bash
     source /opt/ros/humble/setup.bash
     source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-    source ~/Desktop/ROS2_rUBot_mecanum_ws/install/setup.bash
-    cd ~/Desktop/ROS2_rUBot_mecanum_ws
-    export GAZEBO_MODEL_PATH=~/Desktop/ROS2_rUBot_mecanum_ws/src/my_robot_bringup/models:$GAZEBO_MODEL_PATH
+    source /root/my_robot_mecanum_ws/install/setup.bash
+    cd /root/my_robot_mecanum_ws
+    export GAZEBO_MODEL_PATH=/root/my_robot_mecanum_ws/src/my_robot_bringup/models:$GAZEBO_MODEL_PATH
     export QT_QPA_PLATFORM=xcb           # Best for RVIZ2
     export ROS_DOMAIN_ID=1               # group/domain ID
-    export ROS_LOCALHOST_ONLY=0          # allow communication with other machines
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    export CYCLONEDDS_URI=file:///home/student/Desktop/ROS2_rUBot_mecanum_ws/network_config/cyclonedds_pc.xml
+    export CYCLONEDDS_URI=file:///root/my_robot_mecanum_ws/network_config/cyclonedds_pc.xml
     ````
 
 - To stop the container:
@@ -32,3 +31,36 @@
     ````
 
 You are ready to work with ROS2 Humble on Docker!
+
+## Migration sequence
+
+- On PC-win
+````shell
+git clone https://github.com/manelpuig/my_rUBot_mecanum.git
+cd my_rUBot_mecanum
+git status
+git pull
+...
+git add .
+git commit -m "Change"
+git push origin jazzy
+````
+- On ROS2 Jazzy container:
+````shell
+cd /root
+git clone https://github.com/manelpuig/my_rUBot_mecanum.git
+cd my_rUBot_mecanum
+git checkout jazzy
+git pull
+````
+- To verify the changes:
+````shell
+source /opt/ros/jazzy/setup.bash
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y --rosdistro jazzy
+````
+- Build a single package
+````shell
+colcon build --packages-select <package_name> --symlink-install
+source install/setup.bash
+````
