@@ -9,15 +9,34 @@
     ````
 - Open `.bashrc` file inside the container and verify it contains:
     ````bash
-    source /opt/ros/humble/setup.bash
-    source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-    source /root/my_robot_mecanum_ws/install/setup.bash
-    cd /root/my_robot_mecanum_ws
-    export GAZEBO_MODEL_PATH=/root/my_robot_mecanum_ws/src/my_robot_bringup/models:$GAZEBO_MODEL_PATH
-    export QT_QPA_PLATFORM=xcb           # Best for RVIZ2
-    export ROS_DOMAIN_ID=1               # group/domain ID
+    # --------------------------------------------------
+    # ROS 2 Jazzy – base environment
+    # --------------------------------------------------
+    source /opt/ros/jazzy/setup.bash
+
+    # --------------------------------------------------
+    # RMW / DDS (CycloneDDS recommended)
+    # --------------------------------------------------
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    export CYCLONEDDS_URI=file:///root/my_robot_mecanum_ws/network_config/cyclonedds_pc.xml
+
+    # --------------------------------------------------
+    # ROS Domain (default for local dev)
+    # --------------------------------------------------
+    export ROS_DOMAIN_ID=0
+
+    # --------------------------------------------------
+    # Discovery behavior
+    # --------------------------------------------------
+    # Default: local development / simulation
+    export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+
+    # --------------------------------------------------
+    # Networked robot (ENABLE ONLY WHEN NEEDED)
+    # --------------------------------------------------
+    # export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
+    # export ROS_STATIC_PEERS="192.168.1.50"
+    # export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
+
     ````
 
 - To stop the container:
