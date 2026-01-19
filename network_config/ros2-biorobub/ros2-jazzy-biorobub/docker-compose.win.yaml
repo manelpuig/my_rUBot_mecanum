@@ -1,0 +1,37 @@
+services:
+  pc-jazzy:
+    image: manelpuig/ros2-jazzy-biorobub:latest
+    pull_policy: always
+    container_name: pc_jazzy
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+    environment:
+      # XLaunch
+      - DISPLAY=host.docker.internal:0
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+
+      # ROS 2 / DDS
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+      # ⚠️ ALUMNE: CANVIA A 1..5 SEGONS LA PARELLA PC↔ROBOT
+      - ROS_DOMAIN_ID=5
+
+      # ROS 2 Jazzy discovery (recomanat: parelles amb IP fixa)
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
+
+      # ⚠️ ALUMNE: POSA LA IP DEL TEU ROBOT
+      # - ROS_STATIC_PEERS=192.168.1.50
+
+      # Optional CycloneDDS XML (si vols seguir amb l’XML)
+      - CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./config:/config:ro
+      - /etc/localtime:/etc/localtime:ro
+
+    entrypoint: /entrypoint.sh
+    command: sleep infinity

@@ -124,7 +124,7 @@ A proper Docker Image has been created with the custom configuration on Dockerfi
     ````bash
     xhost +local:root            # allow X11 for graphs in container
     cd ~/Desktop/ros2-humble-biorobub
-    docker-compose up -d
+    docker compose up -d
     docker exec -it pc_humble bash
     code .                     # open VSCode inside the container
     ros2 topic list

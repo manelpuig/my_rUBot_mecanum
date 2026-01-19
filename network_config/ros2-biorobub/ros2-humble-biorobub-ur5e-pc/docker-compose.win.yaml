@@ -1,0 +1,26 @@
+services:
+  pc-humble:
+    image: manelpuig/ros2-humble-biorobub-ur5e-pc:latest
+    pull_policy: always
+    container_name: pc_humble
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+    environment:
+      - DISPLAY=host.docker.internal:0
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=5
+      - ROS_LOCALHOST_ONLY=0
+      - CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./config:/config:ro
+      - /etc/localtime:/etc/localtime:ro
+
+    entrypoint: /entrypoint.sh
+    command: sleep infinity

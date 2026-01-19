@@ -1,0 +1,30 @@
+services:
+  pc-humble:
+    image: manelpuig/ros2-humble-biorobub-ur5e-pc:latest
+    pull_policy: always
+    container_name: pc_humble
+
+    network_mode: host
+    ipc: host
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=5
+      - ROS_LOCALHOST_ONLY=0
+      - CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
+
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./config:/config:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/dri:/dev/dri
+
+    entrypoint: /entrypoint.sh
+    command: sleep infinity

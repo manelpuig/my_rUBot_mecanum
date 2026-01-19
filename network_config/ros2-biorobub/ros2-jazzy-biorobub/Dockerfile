@@ -1,0 +1,123 @@
+# ROS 2 Jazzy on Ubuntu 24.04 (Noble)
+# Base image already includes ROS 2 apt repo + keyring.
+FROM osrf/ros:jazzy-desktop-full
+
+SHELL ["/bin/bash", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ----------------------------
+# 1) Core OS utilities + dev tooling + X11/OpenGL helpers
+# ----------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # General utilities
+    curl \
+    wget \
+    gpg \
+    apt-transport-https \
+    ca-certificates \
+    lsb-release \
+    gnupg2 \
+    software-properties-common \
+    iputils-ping \
+    git \
+    unzip \
+    # Build / ROS dev tools
+    build-essential \
+    cmake \
+    python3-colcon-common-extensions \
+    python3-pip \
+    # X11 graphical support (for RViz / Gazebo GUI via X11)
+    x11-apps \
+    libgl1 \
+    libgl1-mesa-dri \
+    libglu1-mesa \
+    mesa-utils \
+    libxkbcommon-x11-0 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# ----------------------------
+# 2) ROS 2 add-ons (Jazzy)
+#    Notes:
+#    - For Jazzy, "Gazebo Classic" is deprecated; use Gazebo (gz) + ros_gz.
+#    - Package availability can vary slightly by sync; keep this list lean + common.
+# ----------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Common robot description / GUI helpers
+    ros-jazzy-joint-state-publisher \
+    ros-jazzy-joint-state-publisher-gui \
+    ros-jazzy-xacro \
+    ros-jazzy-robot-state-publisher \
+    ros-jazzy-tf2-tools \
+    ros-jazzy-rqt \
+    ros-jazzy-rqt-common-plugins \
+    \
+    # Teleop
+    ros-jazzy-teleop-twist-keyboard \
+    ros-jazzy-joy \
+    ros-jazzy-teleop-twist-joy \
+    \
+    # DDS / RMW
+    ros-jazzy-rmw-cyclonedds-cpp \
+    \
+    # Navigation + SLAM (common stack)
+    ros-jazzy-navigation2 \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-slam-toolbox \
+    \
+    # Programmatic navigation helper (if available in your apt repo sync)
+    # If apt complains it's missing, remove this line and use Nav2 actions directly.
+    ros-jazzy-nav2-simple-commander \
+    \
+    # ROSBridge (optional, useful for web / remote UIs)
+    ros-jazzy-rosbridge-server \
+    \
+    # Gazebo (gz) integration for ROS 2 (replaces igngazebo usage)
+    ros-jazzy-ros-gz \
+    ros-jazzy-ros-gz-sim \
+    && rm -rf /var/lib/apt/lists/*
+
+# ----------------------------
+# 3) VS Code (APT, no Snap) – same approach as your Humble Dockerfile
+# ----------------------------
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends wget gpg apt-transport-https ca-certificates; \
+    \
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg; \
+    install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg; \
+    rm -f microsoft.gpg; \
+    \
+    printf "Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64\nSigned-By: /usr/share/keyrings/microsoft.gpg\n" \
+      > /etc/apt/sources.list.d/vscode.sources; \
+    \
+    apt-get update; \
+    apt-get install -y --no-install-recommends code; \
+    rm -rf /var/lib/apt/lists/*
+
+# ----------------------------
+# 4) Optional Python deps (keep minimal; uncomment if needed)
+# ----------------------------
+# RUN pip3 install --no-cache-dir spatialmath-python
+
+# ----------------------------
+# 5) Default ROS 2 environment
+#    - Jazzy: avoid ROS_LOCALHOST_ONLY (deprecated).
+#    - Use ROS_AUTOMATIC_DISCOVERY_RANGE + ROS_STATIC_PEERS (recommended).
+#    - Keep peers out of the image by default (set per deployment).
+# ----------------------------
+ARG ROS_DOMAIN_ID=0
+ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+
+RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc \
+    && echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /root/.bashrc \
+    && echo "export ROS_DOMAIN_ID=${ROS_DOMAIN_ID}" >> /root/.bashrc \
+    && echo "export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF" >> /root/.bashrc \
+    && echo "# export ROS_STATIC_PEERS=\"192.168.1.50\"   # set per PC/robot pair" >> /root/.bashrc \
+    && echo "# export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml  # optional" >> /root/.bashrc
+
+# Keep container alive with an interactive shell
+CMD ["bash"]

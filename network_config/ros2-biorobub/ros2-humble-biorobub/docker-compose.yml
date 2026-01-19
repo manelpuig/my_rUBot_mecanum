@@ -1,0 +1,44 @@
+services:
+  pc-humble:
+    image: manelpuig/ros2-humble-biorobub-pc:latest
+    container_name: pc_humble
+
+    privileged: true
+    network_mode: host
+    ipc: host
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+    environment:
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      # ⚠️ ALUMNE: CANVIA A 1,2,3,4 o 5 SEGONS EL TEU ROBOT
+      - ROS_DOMAIN_ID=5
+      - ROS_LOCALHOST_ONLY=0
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - MESA_GL_VERSION_OVERRIDE=2.1
+      - CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
+
+    volumes:
+      # Entry point script
+      - ./entrypoint.pc.sh:/entrypoint.pc.sh:ro
+
+      # Timezone from host (for correct log timestamps)
+      - /etc/localtime:/etc/localtime:ro
+
+      # X11 display for RViz/Gazebo
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+      # GPU / rendering devices (if needed)
+      - /dev/dri:/dev/dri
+      - /dev/snd:/dev/snd
+
+      # CycloneDDS configuration (PC side)
+      - ./config:/config:ro
+
+      # Optional: mount your ROS 2 workspace inside the container
+      # - ./pc_ws:/root/pc_ws
+
+    entrypoint: /entrypoint.pc.sh
+    command: sleep infinity
