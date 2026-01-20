@@ -41,7 +41,7 @@
 
 - To stop the container:
     ````bash
-    docker-compose down
+    docker compose down
     ````
 - To see the Images and Containers:
     ````bash
