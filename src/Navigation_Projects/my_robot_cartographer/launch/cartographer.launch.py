@@ -55,6 +55,10 @@ def generate_launch_description():
             'use_sim_time',
             default_value='true',
             description='Use simulation (Gazebo) clock if true'),
+        DeclareLaunchArgument(
+            'use_rviz',
+            default_value='true',
+            description='Launch RViz2 if true'),
 
         Node(
             package='cartographer_ros',
