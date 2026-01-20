@@ -1,0 +1,5 @@
+# Force Unix line endings for shell scripts
+*.sh text eol=lf
+*.bash   text eol=lf
+*.zsh    text eol=lf
+Dockerfile text eol=lf
