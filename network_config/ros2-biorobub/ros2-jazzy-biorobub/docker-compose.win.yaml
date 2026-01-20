@@ -20,7 +20,7 @@ services:
       - ROS_DOMAIN_ID=5
 
       # ROS 2 Jazzy discovery (recomanat: parelles amb IP fixa)
-      - ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
 
       # ⚠️ ALUMNE: POSA LA IP DEL TEU ROBOT
       # - ROS_STATIC_PEERS=192.168.1.50

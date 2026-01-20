@@ -28,7 +28,7 @@
     # Discovery behavior
     # --------------------------------------------------
     # Default: local development / simulation
-    export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+    export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET #LOCALHOST
 
     # --------------------------------------------------
     # Networked robot (ENABLE ONLY WHEN NEEDED)
