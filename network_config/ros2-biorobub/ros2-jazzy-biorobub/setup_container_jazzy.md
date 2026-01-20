@@ -9,34 +9,17 @@
     ````
 - Open `.bashrc` file inside the container and verify it contains:
     ````bash
-    # --------------------------------------------------
-    # ROS 2 Jazzy – base environment
-    # --------------------------------------------------
     source /opt/ros/jazzy/setup.bash
-
-    # --------------------------------------------------
-    # RMW / DDS (CycloneDDS recommended)
-    # --------------------------------------------------
+    source /root/my_rUBot_mecanum/install/setup.bash
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-
-    # --------------------------------------------------
-    # ROS Domain (default for local dev)
-    # --------------------------------------------------
-    export ROS_DOMAIN_ID=0
-
-    # --------------------------------------------------
-    # Discovery behavior
-    # --------------------------------------------------
-    # Default: local development / simulation
-    export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET #LOCALHOST
-
-    # --------------------------------------------------
-    # Networked robot (ENABLE ONLY WHEN NEEDED)
-    # --------------------------------------------------
-    # export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
-    # export ROS_STATIC_PEERS="192.168.1.50"
-    # export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
-
+    export ROS_DOMAIN_ID=5 # robot number
+    export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST # Mode simulation
+    #export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF # Mode robot
+    #export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET # Mode Local Development
+    #export ROS_STATIC_PEERS="192.168.1.45" # Mode robot with robot IP
+    #export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml # Mode Local Development/robot
+    unset CYCLONEDDS_URI # Mode simulation
+    unset ROS_STATIC_PEERS # Mode simulation
     ````
 
 - To stop the container:

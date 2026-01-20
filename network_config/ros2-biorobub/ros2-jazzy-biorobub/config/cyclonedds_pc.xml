@@ -2,10 +2,30 @@
 <CycloneDDS xmlns="https://cdds.io/config">
   <Domain id="any">
     <General>
+
+      <!--
+        Let CycloneDDS automatically select the best available local interface.
+        This works on:
+          - Docker containers (eth0, 172.x.x.x)
+          - PCs with WiFi/Ethernet
+          - Laptops switching networks
+      -->
       <Interfaces>
-        <NetworkInterface address="192.168.1.45" priority="default"/>
+        <NetworkInterface address="auto" priority="default"/>
       </Interfaces>
+
+      <!--
+        Increase max message size for point clouds, images, maps, etc.
+        (Default is often too small for robotics)
+      -->
       <MaxMessageSize>65500B</MaxMessageSize>
+
+      <!--
+        Avoid DDS traffic on localhost-only when networking is enabled
+        (safe default)
+      -->
+      <AllowMulticast>true</AllowMulticast>
+
     </General>
   </Domain>
 </CycloneDDS>
