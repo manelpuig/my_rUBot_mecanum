@@ -1,8 +1,11 @@
-<CycloneDDS>
-  <Domain>
+<?xml version="1.0" encoding="UTF-8"?>
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain id="any">
     <General>
-      <AllowMulticast>false</AllowMulticast>
-      <NetworkInterfaceAddress>auto</NetworkInterfaceAddress>
+      <Interfaces>
+        <NetworkInterface address="192.168.1.45" priority="default"/>
+      </Interfaces>
+      <MaxMessageSize>65500B</MaxMessageSize>
     </General>
   </Domain>
 </CycloneDDS>

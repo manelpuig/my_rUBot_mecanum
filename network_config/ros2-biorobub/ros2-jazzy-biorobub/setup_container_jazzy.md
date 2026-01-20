@@ -57,6 +57,7 @@ You are ready to work with ROS2 Humble on Docker!
 ````shell
 git clone https://github.com/manelpuig/my_rUBot_mecanum.git
 cd my_rUBot_mecanum
+git checkout jazzy
 git status
 git pull
 ...
@@ -70,6 +71,7 @@ cd /root
 git clone https://github.com/manelpuig/my_rUBot_mecanum.git
 cd my_rUBot_mecanum
 git checkout jazzy
+git status
 git pull
 ````
 - To verify the changes:
