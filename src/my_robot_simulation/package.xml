@@ -2,9 +2,9 @@
 <package format="3">
   <name>my_robot_simulation</name>
   <version>0.0.1</version>
-  <description>Gazebo Sim (gz_sim) bringup for my_robot (simulation-only stack): world + spawn + ROS<->GZ bridge.</description>
+  <description>Gazebo Sim (gz_sim) bringup: world, model spawn, ROS-GZ bridges.</description>
 
-  <maintainer email="you@example.com">Manel</maintainer>
+  <maintainer email="manel@example.com">Manel</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -13,7 +13,7 @@
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
 
-  <!-- Robot description pipeline -->
+  <!-- Robot description / TF -->
   <exec_depend>xacro</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
 
@@ -21,7 +21,7 @@
   <exec_depend>ros_gz_sim</exec_depend>
   <exec_depend>ros_gz_bridge</exec_depend>
 
-  <!-- Message types commonly bridged -->
+  <!-- Messages commonly bridged -->
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>

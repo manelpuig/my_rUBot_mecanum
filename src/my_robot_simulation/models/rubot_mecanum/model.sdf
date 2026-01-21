@@ -149,7 +149,7 @@
     </joint>
 
     <!-- Mecanum drive system (subscribes Twist and drives wheel joints) -->
-    <plugin name="mecanum_drive" filename="gz-sim-mecanum-drive-system">
+    <plugin filename="gz-sim-mecanum-drive-system" name="gz::sim::systems::MecanumDrive">
       <!-- Command topic inside Gazebo -->
       <topic>/cmd_vel</topic>
 
@@ -167,7 +167,7 @@
     </plugin>
 
     <!-- Recommended: publish odometry (and optionally TF) -->
-    <plugin name="odom_pub" filename="gz-sim-odometry-publisher-system">
+    <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
       <odom_topic>/odom</odom_topic>
       <odom_frame>odom</odom_frame>
       <robot_base_frame>base_link</robot_base_frame>
