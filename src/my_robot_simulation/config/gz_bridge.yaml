@@ -1,0 +1,44 @@
+# ROS <-> Gazebo Sim bridge configuration for ros_gz_bridge/parameter_bridge
+# IMPORTANT:
+# - Adjust gz_topic_name once your gz_sim model publishes the corresponding topics.
+# - For sensors / odom, gz topic names often include the model name, e.g.:
+#   /model/<model_name>/odometry
+#   /model/<model_name>/lidar/scan
+# This file is intentionally "simple" and you will likely update it.
+
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/cmd_vel"
+  gz_topic_name: "/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/odom"
+  gz_topic_name: "/odom"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/scan"
+  gz_topic_name: "/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+# Optional camera bridges (enable once your gz_sim camera publishes these)
+# - ros_topic_name: "/camera/image_raw"
+#   gz_topic_name: "/camera/image"
+#   ros_type_name: "sensor_msgs/msg/Image"
+#   gz_type_name: "gz.msgs.Image"
+#   direction: GZ_TO_ROS
+#
+# - ros_topic_name: "/camera/camera_info"
+#   gz_topic_name: "/camera/camera_info"
+#   ros_type_name: "sensor_msgs/msg/CameraInfo"
+#   gz_type_name: "gz.msgs.CameraInfo"
+#   direction: GZ_TO_ROS
