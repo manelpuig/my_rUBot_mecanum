@@ -26,7 +26,7 @@ def generate_launch_description():
 
     declare_model_name = DeclareLaunchArgument(
         "model_name",
-        default_value="rubot",
+        default_value="rubot_mecanum",
         description="Name of the spawned model in Gazebo Sim"
     )
 
@@ -48,6 +48,23 @@ def generate_launch_description():
         description="YAML config file for ros_gz_bridge parameter_bridge"
     )
 
+    # Spawn pose arguments (x, y, z, w=yaw)
+    declare_x = DeclareLaunchArgument(
+        "x",
+        default_value="0.0",
+        description="Initial X position of the robot in the world frame (m)"
+    )
+    declare_y = DeclareLaunchArgument(
+        "y",
+        default_value="0.0",
+        description="Initial Y position of the robot in the world frame (m)"
+    )
+    declare_w = DeclareLaunchArgument(
+        "w",
+        default_value="0.0",
+        description="Initial yaw (rotation about Z) of the robot in the world frame (rad)"
+    )
+
     # Optional: run robot_state_publisher using a *clean* URDF/Xacro (recommended)
     declare_publish_tf = DeclareLaunchArgument(
         "publish_tf",
@@ -65,13 +82,18 @@ def generate_launch_description():
         description="Path to CLEAN robot xacro (no Gazebo plugins)"
     )
 
+    # LaunchConfigurations
     world = LaunchConfiguration("world")
     model_name = LaunchConfiguration("model_name")
     model_file = LaunchConfiguration("model_file")
     use_sim_time = LaunchConfiguration("use_sim_time")
     bridge_config = LaunchConfiguration("bridge_config")
-    publish_tf = LaunchConfiguration("publish_tf")
+    publish_tf = LaunchConfiguration("publish_tf")  # kept for compatibility (not used as condition here)
     xacro_file = LaunchConfiguration("xacro_file")
+
+    x = LaunchConfiguration("x")
+    y = LaunchConfiguration("y")
+    w = LaunchConfiguration("w")  # yaw
 
     # -----------------------------
     # Gazebo Sim launch
@@ -88,12 +110,13 @@ def generate_launch_description():
     # -----------------------------
     # Spawn robot in Gazebo Sim from model.sdf
     # -----------------------------
-    # Use a small delay so Gazebo is ready before spawning.
     spawn_robot = ExecuteProcess(
         cmd=[
             "ros2", "run", "ros_gz_sim", "create",
             "-name", model_name,
             "-file", model_file,
+            "-x", x, "-y", y, "-z", "0.05",
+            "-R", "0", "-P", "0", "-Y", w,
         ],
         output="screen",
     )
@@ -117,6 +140,11 @@ def generate_launch_description():
         }],
     )
 
+    bridge_delayed = TimerAction(
+        period=3.0,
+        actions=[bridge]
+    )
+
     # -----------------------------
     # robot_state_publisher (TF from clean URDF)
     # -----------------------------
@@ -124,17 +152,11 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="screen",
-        condition=None,  # we’ll gate by parameter using 'if' in runtime via launch arg below
         parameters=[{
             "use_sim_time": use_sim_time,
             "robot_description": Command(["xacro ", xacro_file]),
         }],
     )
-
-    # Simple gating: if publish_tf=false, just don't start robot_state_publisher
-    # (Launch "condition" needs import; easiest is to keep it always on and set publish_tf default true.
-    # If you prefer a real condition, tell me and I provide the IfCondition version.)
-    # For now: start always; you can set publish_tf=false later and delete this node if desired.
 
     return LaunchDescription([
         declare_world,
@@ -142,11 +164,16 @@ def generate_launch_description():
         declare_model_file,
         declare_use_sim_time,
         declare_bridge_config,
+
+        declare_x,
+        declare_y,
+        declare_w,
+
         declare_publish_tf,
         declare_xacro_file,
 
         gz_launch,
         spawn_robot_delayed,
-        bridge,
+        bridge_delayed,
         robot_state_publisher,
     ])
