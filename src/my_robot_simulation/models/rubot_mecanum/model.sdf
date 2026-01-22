@@ -239,28 +239,37 @@
           <diffuse>0.15 0.15 0.15 1</diffuse>
         </material>
       </visual>
-
-      <sensor name="lidar" type="ray">
+      <sensor name="lidar" type="gpu_lidar">
         <always_on>true</always_on>
         <update_rate>10</update_rate>
-        <ray>
+        <topic>/scan</topic>
+
+        <pose>0 0 0 0 0 0</pose>
+
+        <lidar>
           <scan>
             <horizontal>
-              <samples>720</samples>
+              <samples>360</samples>
               <resolution>1</resolution>
-              <min_angle>-3.14159265359</min_angle>
-              <max_angle> 3.14159265359</max_angle>
+              <min_angle>-3.14159</min_angle>
+              <max_angle> 3.14159</max_angle>
             </horizontal>
           </scan>
-          <range>
-            <min>0.12</min>
-            <max>3.5</max>
-            <resolution>0.015</resolution>
-          </range>
-        </ray>
 
-        <!-- Force exact gz topic to match your bridge -->
-        <topic>/scan</topic>
+          <range>
+            <!-- CRÍTIC: min > 0 -->
+            <min>0.12</min>
+            <max>10.0</max>
+            <resolution>0.01</resolution>
+          </range>
+
+          <!-- IMPORTANT per evitar coses rares -->
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.0</stddev>
+          </noise>
+        </lidar>
       </sensor>
     </link>
     <joint name="scan_joint" type="fixed">
@@ -292,7 +301,10 @@
             <height>240</height>
             <format>R8G8B8</format>
           </image>
-          <clip><near>0.02</near><far>50</far></clip>
+          <clip>
+            <near>0.05</near>
+            <far>100</far>
+          </clip>
         </camera>
 
         <!-- This will produce /camera/image and /camera/camera_info in gz -->

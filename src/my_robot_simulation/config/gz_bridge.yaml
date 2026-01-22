@@ -5,7 +5,6 @@
 #   /model/<model_name>/odometry
 #   /model/<model_name>/lidar/scan
 # This file is intentionally "simple" and you will likely update it.
-
 - ros_topic_name: "/clock"
   gz_topic_name: "/clock"
   ros_type_name: "rosgraph_msgs/msg/Clock"
@@ -18,11 +17,10 @@
   gz_type_name: "gz.msgs.Twist"
   direction: ROS_TO_GZ
 
-# Odometry (Gazebo -> ROS)
-- gz_topic_name: /model/rubot_mecanum/odometry
-  gz_msg_type: gz.msgs.Odometry
-  ros_topic_name: /odom
-  ros_msg_type: nav_msgs/msg/Odometry
+- ros_topic_name: "/odom"
+  gz_topic_name: "/model/rubot_mecanum/odometry"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
   direction: GZ_TO_ROS
 
 - ros_topic_name: "/scan"
@@ -31,15 +29,14 @@
   gz_type_name: "gz.msgs.LaserScan"
   direction: GZ_TO_ROS
 
-# Camera (Gazebo -> ROS)
-- gz_topic_name: /camera
-  gz_msg_type: gz.msgs.Image
-  ros_topic_name: /camera/image_raw
-  ros_msg_type: sensor_msgs/msg/Image
+- ros_topic_name: "/camera/image_raw"
+  gz_topic_name: "/camera"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-- gz_topic_name: /camera_info
-  gz_msg_type: gz.msgs.CameraInfo
-  ros_topic_name: /camera/camera_info
-  ros_msg_type: sensor_msgs/msg/CameraInfo
+- ros_topic_name: "/camera/camera_info"
+  gz_topic_name: "/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
   direction: GZ_TO_ROS
