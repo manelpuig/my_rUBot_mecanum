@@ -537,7 +537,7 @@ sudo apt install ros-humble-teleop-twist-keyboard
 When you are using the virtual environment to simulate the robot behavior you have to:
 - Bringup our robot in Gazebo virtual environment
   ````shell
-  ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
+  ros2 launch my_robot_simulation bringup_gz.launch.py x:=0.5 y:=-1.5 w:=1.57 world:=empty_world.sdf
   ````
   > The argument `use_sim_time` is by default true in this launch file
 

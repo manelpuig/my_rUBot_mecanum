@@ -3,7 +3,7 @@
   <model name="rubot_mecanum">
 
     <!-- Pose: centre del base_link a wheel_radius per tocar terra -->
-    <pose>0 0 0 0 0 0</pose>
+    <pose>0 0 0.105 0 0 0</pose>
     <static>false</static>
 
     <!-- =========================
@@ -52,7 +52,7 @@
 
     <!-- Upper left -->
     <link name="upper_left_wheel">
-      <pose relative_to="base_link">0.07 0.105 0 0 0 0</pose>
+      <pose relative_to="base_link">0.07 0.105 -0.05 0 0 0</pose>
 
       <inertial>
         <mass>0.2</mass>
@@ -68,10 +68,8 @@
         <geometry><cylinder><radius>0.055</radius><length>0.03</length></cylinder></geometry>
         <surface>
           <friction>
-            <ode>
-              <mu>1.0</mu>
-              <mu2>1.0</mu2>
-            </ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
           </friction>
         </surface>
       </collision>
@@ -90,13 +88,17 @@
       <pose>0 0 0 0 0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
+        <dynamics>
+          <damping>0.1</damping>
+          <friction>0.1</friction>
+        </dynamics>
         <limit><lower>-1e16</lower><upper>1e16</upper></limit>
       </axis>
     </joint>
 
     <!-- Lower left -->
     <link name="lower_left_wheel">
-      <pose relative_to="base_link">-0.085 0.105 0 0 0 0</pose>
+      <pose relative_to="base_link">-0.085 0.105 -0.05 0 0 0</pose>
 
       <inertial>
         <mass>0.2</mass>
@@ -112,10 +114,8 @@
         <geometry><cylinder><radius>0.055</radius><length>0.03</length></cylinder></geometry>
         <surface>
           <friction>
-            <ode>
-              <mu>1.0</mu>
-              <mu2>1.0</mu2>
-            </ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
           </friction>
         </surface>
       </collision>
@@ -134,13 +134,17 @@
       <pose>0 0 0 0 0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
+        <dynamics>
+          <damping>0.1</damping>
+          <friction>0.1</friction>
+        </dynamics>
         <limit><lower>-1e16</lower><upper>1e16</upper></limit>
       </axis>
     </joint>
 
     <!-- Upper right -->
     <link name="upper_right_wheel">
-      <pose relative_to="base_link">0.07 -0.105 0 0 0 0</pose>
+      <pose relative_to="base_link">0.07 -0.105 -0.05 0 0 0</pose>
 
       <inertial>
         <mass>0.2</mass>
@@ -156,10 +160,8 @@
         <geometry><cylinder><radius>0.055</radius><length>0.03</length></cylinder></geometry>
         <surface>
           <friction>
-            <ode>
-              <mu>1.0</mu>
-              <mu2>1.0</mu2>
-            </ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
           </friction>
         </surface>
       </collision>
@@ -177,14 +179,18 @@
       <child>upper_right_wheel</child>
       <pose>0 0 0 0 0 0</pose>
       <axis>
-        <xyz>0 -1 0</xyz>
+        <xyz>0 1 0</xyz>
+        <dynamics>
+          <damping>0.1</damping>
+          <friction>0.1</friction>
+        </dynamics>
         <limit><lower>-1e16</lower><upper>1e16</upper></limit>
       </axis>
     </joint>
 
     <!-- Lower right -->
     <link name="lower_right_wheel">
-      <pose relative_to="base_link">-0.085 -0.105 0 0 0 0</pose>
+      <pose relative_to="base_link">-0.085 -0.105 -0.05 0 0 0</pose>
 
       <inertial>
         <mass>0.2</mass>
@@ -200,10 +206,8 @@
         <geometry><cylinder><radius>0.055</radius><length>0.03</length></cylinder></geometry>
         <surface>
           <friction>
-            <ode>
-              <mu>1.0</mu>
-              <mu2>1.0</mu2>
-            </ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
           </friction>
         </surface>
       </collision>
@@ -221,7 +225,11 @@
       <child>lower_right_wheel</child>
       <pose>0 0 0 0 0 0</pose>
       <axis>
-        <xyz>0 -1 0</xyz>
+        <xyz>0 1 0</xyz>
+        <dynamics>
+          <damping>0.1</damping>
+          <friction>0.1</friction>
+        </dynamics>
         <limit><lower>-1e16</lower><upper>1e16</upper></limit>
       </axis>
     </joint>
@@ -332,6 +340,8 @@
       <wheel_radius>0.055</wheel_radius>
       <wheel_separation_width>0.21</wheel_separation_width>
       <wheel_separation_length>0.155</wheel_separation_length>
+      <!-- ajuda a veure moviment a /odom -->
+      <odom_publish_frequency>50</odom_publish_frequency>
     </plugin>
 
     <plugin filename="libgz-sim8-odometry-publisher-system.so" name="gz::sim::systems::OdometryPublisher">

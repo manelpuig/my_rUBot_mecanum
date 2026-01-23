@@ -115,7 +115,7 @@ def generate_launch_description():
             "ros2", "run", "ros_gz_sim", "create",
             "-name", model_name,
             "-file", model_file,
-            "-x", x, "-y", y, "-z", "0.05",
+            "-x", x, "-y", y, "-z", "0.1",
             "-R", "0", "-P", "0", "-Y", w,
         ],
         output="screen",
