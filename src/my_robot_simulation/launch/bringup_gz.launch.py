@@ -4,176 +4,122 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, TextSubstitution, Command
+from launch.actions import DeclareLaunchArgument, TimerAction, OpaqueFunction, ExecuteProcess
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     pkg_sim = get_package_share_directory("my_robot_simulation")
-    ros_gz_sim_share = get_package_share_directory("ros_gz_sim")
 
-    # -----------------------------
-    # Launch arguments
-    # -----------------------------
     declare_world = DeclareLaunchArgument(
         "world",
-        default_value=os.path.join(pkg_sim, "worlds", "empty_world.sdf"),
-        description="Full path to an SDF world file"
+        default_value="empty_world.sdf",
+        description="World SDF filename inside my_robot_simulation/worlds"
     )
-
+    declare_robot = DeclareLaunchArgument(
+        "robot",
+        default_value="rubot_differential",
+        description="Robot model folder name inside my_robot_simulation/models"
+    )
     declare_model_name = DeclareLaunchArgument(
         "model_name",
-        default_value="rubot_mecanum",
-        description="Name of the spawned model in Gazebo Sim"
+        default_value="",
+        description="Spawned model name in Gazebo. If empty, uses robot argument."
     )
-
-    declare_model_file = DeclareLaunchArgument(
-        "model_file",
-        default_value=os.path.join(pkg_sim, "models", "rubot_mecanum", "model.sdf"),
-        description="Full path to model.sdf (Gazebo Sim model)"
-    )
-
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
         default_value="true",
         description="Use simulation time"
     )
 
-    declare_bridge_config = DeclareLaunchArgument(
-        "bridge_config",
-        default_value=os.path.join(pkg_sim, "config", "gz_bridge.yaml"),
-        description="YAML config file for ros_gz_bridge parameter_bridge"
-    )
+    declare_x = DeclareLaunchArgument("x", default_value="0.0", description="Initial X (m)")
+    declare_y = DeclareLaunchArgument("y", default_value="0.0", description="Initial Y (m)")
+    declare_z = DeclareLaunchArgument("z", default_value="0.10", description="Initial Z (m)")
+    declare_yaw = DeclareLaunchArgument("yaw", default_value="0.0", description="Initial yaw (rad)")
 
-    # Spawn pose arguments (x, y, z, w=yaw)
-    declare_x = DeclareLaunchArgument(
-        "x",
-        default_value="0.0",
-        description="Initial X position of the robot in the world frame (m)"
-    )
-    declare_y = DeclareLaunchArgument(
-        "y",
-        default_value="0.0",
-        description="Initial Y position of the robot in the world frame (m)"
-    )
-    declare_w = DeclareLaunchArgument(
-        "w",
-        default_value="0.0",
-        description="Initial yaw (rotation about Z) of the robot in the world frame (rad)"
-    )
-
-    # Optional: run robot_state_publisher using a *clean* URDF/Xacro (recommended)
-    declare_publish_tf = DeclareLaunchArgument(
-        "publish_tf",
-        default_value="true",
-        description="Run robot_state_publisher (TF) from my_robot_description"
-    )
-
-    declare_xacro_file = DeclareLaunchArgument(
-        "xacro_file",
-        default_value=PathJoinSubstitution([
-            FindPackageShare("my_robot_description"),
-            "urdf",
-            "rubot/rubot_mecanum_clean.urdf.xacro",
-        ]),
-        description="Path to CLEAN robot xacro (no Gazebo plugins)"
-    )
-
-    # LaunchConfigurations
     world = LaunchConfiguration("world")
+    robot = LaunchConfiguration("robot")
     model_name = LaunchConfiguration("model_name")
-    model_file = LaunchConfiguration("model_file")
     use_sim_time = LaunchConfiguration("use_sim_time")
-    bridge_config = LaunchConfiguration("bridge_config")
-    publish_tf = LaunchConfiguration("publish_tf")  # kept for compatibility (not used as condition here)
-    xacro_file = LaunchConfiguration("xacro_file")
-
     x = LaunchConfiguration("x")
     y = LaunchConfiguration("y")
-    w = LaunchConfiguration("w")  # yaw
+    z = LaunchConfiguration("z")
+    yaw = LaunchConfiguration("yaw")
 
-    # -----------------------------
-    # Gazebo Sim launch
-    # -----------------------------
-    gz_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(ros_gz_sim_share, "launch", "gz_sim.launch.py")
-        ),
-        launch_arguments={
-            "gz_args": [TextSubstitution(text="-r "), world],
-        }.items(),
-    )
+    def launch_setup(context, *args, **kwargs):
+        world_file = context.perform_substitution(world)
+        robot_name = context.perform_substitution(robot)
+        spawn_name = context.perform_substitution(model_name).strip() or robot_name
 
-    # -----------------------------
-    # Spawn robot in Gazebo Sim from model.sdf
-    # -----------------------------
-    spawn_robot = ExecuteProcess(
-        cmd=[
-            "ros2", "run", "ros_gz_sim", "create",
-            "-name", model_name,
-            "-file", model_file,
-            "-x", x, "-y", y, "-z", "0.1",
-            "-R", "0", "-P", "0", "-Y", w,
-        ],
-        output="screen",
-    )
+        world_path = os.path.join(pkg_sim, "worlds", world_file)
+        model_file = os.path.join(pkg_sim, "models", robot_name, "model.sdf")
 
-    spawn_robot_delayed = TimerAction(
-        period=2.0,
-        actions=[spawn_robot]
-    )
+        if not os.path.exists(world_path):
+            raise RuntimeError(f"World not found: {world_path}")
+        if not os.path.exists(model_file):
+            raise RuntimeError(f"Model not found: {model_file}")
 
-    # -----------------------------
-    # Bridge (topics defined in YAML)
-    # -----------------------------
-    bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        name="gz_bridge",
-        output="screen",
-        parameters=[{
-            "use_sim_time": use_sim_time,
-            "config_file": bridge_config,
-        }],
-    )
+        # 1) Start server (services enabled)
+        gz_server = ExecuteProcess(
+            cmd=["gz", "sim", "-r", "-s", world_path],
+            output="screen",
+        )
 
-    bridge_delayed = TimerAction(
-        period=3.0,
-        actions=[bridge]
-    )
+        # 2) Start GUI (connect to server)
+        # Delay a bit so the server is already up.
+        gz_gui = ExecuteProcess(
+            cmd=["gz", "sim", "-g"],
+            output="screen",
+        )
+        gz_gui_delayed = TimerAction(period=1.0, actions=[gz_gui])
 
-    # -----------------------------
-    # robot_state_publisher (TF from clean URDF)
-    # -----------------------------
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="screen",
-        parameters=[{
-            "use_sim_time": use_sim_time,
-            "robot_description": Command(["xacro ", xacro_file]),
-        }],
-    )
+        # 3) Spawn robot (needs UserCommands system in the world)
+        spawn_robot = Node(
+            package="ros_gz_sim",
+            executable="create",
+            output="screen",
+            arguments=[
+                "-world", "empty_world",
+                "-name", spawn_name,
+                "-file", model_file,
+                "-x", context.perform_substitution(x),
+                "-y", context.perform_substitution(y),
+                "-z", context.perform_substitution(z),
+                "-R", "0", "-P", "0",
+                "-Y", context.perform_substitution(yaw),
+            ],
+        )
+        spawn_robot_delayed = TimerAction(period=3.0, actions=[spawn_robot])
+
+        # 4) Bridge
+        use_sim_time_str = context.perform_substitution(use_sim_time)
+        use_sim_time_bool = use_sim_time_str.strip().lower() in ("true", "1", "yes")
+
+        bridge = Node(
+            package="ros_gz_bridge",
+            executable="parameter_bridge",
+            name="ros_gz_bridge",
+            output="screen",
+            arguments=[
+                "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
+                "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
+                "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+                "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+                "/camera@sensor_msgs/msg/Image[gz.msgs.Image",
+                "/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
+            ],
+            parameters=[{"use_sim_time": use_sim_time_bool}],
+        )
+        bridge_delayed = TimerAction(period=4.0, actions=[bridge])
+
+        return [gz_server, gz_gui_delayed, spawn_robot_delayed, bridge_delayed]
 
     return LaunchDescription([
         declare_world,
+        declare_robot,
         declare_model_name,
-        declare_model_file,
         declare_use_sim_time,
-        declare_bridge_config,
-
-        declare_x,
-        declare_y,
-        declare_w,
-
-        declare_publish_tf,
-        declare_xacro_file,
-
-        gz_launch,
-        spawn_robot_delayed,
-        bridge_delayed,
-        robot_state_publisher,
+        declare_x, declare_y, declare_z, declare_yaw,
+        OpaqueFunction(function=launch_setup),
     ])

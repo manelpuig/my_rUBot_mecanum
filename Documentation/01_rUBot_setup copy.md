@@ -122,19 +122,16 @@ Students will control the robot from their **PC-computers** (Linux/ubuntu) conne
   ````
 - Open `.bashrc` file inside the container and verify it contains:
     ````bash
-    source /opt/ros/jazzy/setup.bash
-    source /root/my_rUBot_mecanum/install/setup.bash
+    source /opt/ros/humble/setup.bash
+    source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
+    source ~/Desktop/ROS2_rUBot_mecanum_ws/install/setup.bash
+    cd ~/Desktop/ROS2_rUBot_mecanum_ws
+    export GAZEBO_MODEL_PATH=~/Desktop/ROS2_rUBot_mecanum_ws/src/my_robot_bringup/models:$GAZEBO_MODEL_PATH
+    export QT_QPA_PLATFORM=xcb           # Best for RVIZ2
+    export ROS_DOMAIN_ID=1               # group/domain ID
+    export ROS_LOCALHOST_ONLY=0          # allow communication with other machines
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    export ROS_DOMAIN_ID=5 # robot number
-    export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST # Mode simulation
-    #export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF # Mode robot
-    #export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET # Mode Local Development
-    #export ROS_STATIC_PEERS="192.168.1.45" # Mode robot with robot IP
-    #export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml # Mode Local Development/robot
-    unset CYCLONEDDS_URI # Mode simulation
-    unset ROS_STATIC_PEERS # Mode simulation
-    cd my_rUBot_mecanum
-    export GZ_SIM_RESOURCE_PATH=/root/my_rUBot_mecanum/src/my_robot_simulation/models
+    export CYCLONEDDS_URI=file:///home/student/Desktop/ROS2_rUBot_mecanum_ws/network_config/cyclonedds_pc.xml
     ````
     > Modify the `ROS_DOMAIN_ID` correspondingly to your robot.
 - Open a new terminal and verify you see the 5 main nodes running on your robot:

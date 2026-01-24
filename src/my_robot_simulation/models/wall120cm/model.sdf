@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.10">
+    <model name="wall120cm">
+        <static>true</static>
+        <pose>0 0 0.025 0 0 0</pose> <!-- z=0.025 perquè reposi a terra (meitat del gruix) -->
+
+        <link name="link">
+            <collision name="collision">
+            <geometry>
+                <box>
+                <size>1.2 0.05 0.3</size>
+                </box>
+            </geometry>
+            </collision>
+
+            <visual name="visual">
+            <geometry>
+                <box>
+                <size>1.2 0.05 0.3</size>
+                </box>
+            </geometry>
+            <material>
+                <ambient>0.45 0.30 0.15 1</ambient>
+                <diffuse>0.45 0.30 0.15 1</diffuse>
+            </material>
+            </visual>
+        </link>
+    </model>
+</sdf>
