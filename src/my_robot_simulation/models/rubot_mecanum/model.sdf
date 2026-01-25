@@ -119,10 +119,11 @@
       </visual>
 
       <sensor name="lidar" type="gpu_lidar">
+        <pose>0 0 0 0 0 0</pose>
         <always_on>true</always_on>
         <update_rate>10</update_rate>
         <topic>/scan</topic>
-        <pose>0 0 0 0 0 0</pose>
+        <frame_id>base_scan</frame_id>
 
         <lidar>
           <scan>

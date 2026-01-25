@@ -135,6 +135,16 @@ Students will control the robot from their **PC-computers** (Linux/ubuntu) conne
     unset ROS_STATIC_PEERS # Mode simulation
     cd my_rUBot_mecanum
     export GZ_SIM_RESOURCE_PATH=/root/my_rUBot_mecanum/src/my_robot_simulation/models
+
+    # RViz in Docker: force software OpenGL (llvmpipe) and stable GL/GLSL versions
+    export LIBGL_ALWAYS_SOFTWARE=1
+    export GALLIUM_DRIVER=llvmpipe
+    export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
+    export MESA_GL_VERSION_OVERRIDE=3.3
+    export MESA_GLSL_VERSION_OVERRIDE=330
+
+    # If needed for X11
+    export QT_QPA_PLATFORM=xcb
     ````
     > Modify the `ROS_DOMAIN_ID` correspondingly to your robot.
 - Open a new terminal and verify you see the 5 main nodes running on your robot:

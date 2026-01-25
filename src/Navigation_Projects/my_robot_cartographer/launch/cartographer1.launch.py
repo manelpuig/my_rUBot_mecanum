@@ -1,3 +1,15 @@
+# Copyright 2019 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Author: Darby Lim
+#
+# Updated for rUBot mecanum + gz-sim: lidar frame alias + docker-friendly RViz default.
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -31,6 +43,20 @@ def generate_launch_description():
     publish_period_sec = LaunchConfiguration("publish_period_sec", default="1.0")
 
     rviz_config_file = os.path.join(pkg_share, "rviz", "my_robot_cartographer2.rviz")
+
+    # --- IMPORTANT: lidar frame alias ---
+    # Your /scan has header.frame_id = "rubot_mecanum/base_scan/lidar"
+    # but TF tree contains: base_link -> base_scan
+    # This static TF makes the scan frame resolvable by TF consumers (Cartographer, RViz).
+    lidar_alias_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="lidar_alias_tf",
+        # x y z roll pitch yaw parent child
+        arguments=["0", "0", "0", "0", "0", "0", "base_scan", "rubot_mecanum/base_scan/lidar"],
+        output="screen",
+        parameters=[{"use_sim_time": use_sim_time}],
+    )
 
     cartographer_node = Node(
         package="cartographer_ros",
@@ -102,6 +128,7 @@ def generate_launch_description():
         ),
 
         # Order matters: publish TF alias first, then cartographer
+        lidar_alias_tf,
         cartographer_node,
         occupancy_grid,
         rviz2,
