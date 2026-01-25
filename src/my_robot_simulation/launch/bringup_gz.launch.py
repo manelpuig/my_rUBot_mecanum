@@ -2,41 +2,58 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, TimerAction, OpaqueFunction, ExecuteProcess
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
     pkg_sim = get_package_share_directory("my_robot_simulation")
 
+    # ----------------------------
+    # Launch arguments
+    # ----------------------------
     declare_world = DeclareLaunchArgument(
         "world",
         default_value="empty_world.sdf",
         description="World SDF filename inside my_robot_simulation/worlds"
     )
+
     declare_robot = DeclareLaunchArgument(
         "robot",
-        default_value="rubot_differential",
+        default_value="rubot_mecanum",
         description="Robot model folder name inside my_robot_simulation/models"
     )
+
     declare_model_name = DeclareLaunchArgument(
         "model_name",
         default_value="",
         description="Spawned model name in Gazebo. If empty, uses robot argument."
     )
+
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
         default_value="true",
         description="Use simulation time"
     )
 
-    declare_x = DeclareLaunchArgument("x", default_value="0.0", description="Initial X (m)")
-    declare_y = DeclareLaunchArgument("y", default_value="0.0", description="Initial Y (m)")
-    declare_z = DeclareLaunchArgument("z", default_value="0.10", description="Initial Z (m)")
-    declare_yaw = DeclareLaunchArgument("yaw", default_value="0.0", description="Initial yaw (rad)")
+    declare_x = DeclareLaunchArgument("x", default_value="0.0")
+    declare_y = DeclareLaunchArgument("y", default_value="0.0")
+    declare_z = DeclareLaunchArgument("z", default_value="0.10")
+    declare_yaw = DeclareLaunchArgument("yaw", default_value="0.0")
+
+    # Robot description (ROS-pure)
+    declare_description_pkg = DeclareLaunchArgument(
+        "description_pkg",
+        default_value="my_robot_description"
+    )
+
+    declare_description_xacro = DeclareLaunchArgument(
+        "description_xacro",
+        default_value="rubot/rubot_mecanum_clean.urdf.xacro"
+    )
 
     world = LaunchConfiguration("world")
     robot = LaunchConfiguration("robot")
@@ -46,35 +63,31 @@ def generate_launch_description():
     y = LaunchConfiguration("y")
     z = LaunchConfiguration("z")
     yaw = LaunchConfiguration("yaw")
+    description_pkg = LaunchConfiguration("description_pkg")
+    description_xacro = LaunchConfiguration("description_xacro")
 
     def launch_setup(context, *args, **kwargs):
-        world_file = context.perform_substitution(world)
         robot_name = context.perform_substitution(robot)
         spawn_name = context.perform_substitution(model_name).strip() or robot_name
 
-        world_path = os.path.join(pkg_sim, "worlds", world_file)
+        world_path = os.path.join(pkg_sim, "worlds", context.perform_substitution(world))
         model_file = os.path.join(pkg_sim, "models", robot_name, "model.sdf")
 
-        if not os.path.exists(world_path):
-            raise RuntimeError(f"World not found: {world_path}")
-        if not os.path.exists(model_file):
-            raise RuntimeError(f"Model not found: {model_file}")
+        use_sim_time_bool = context.perform_substitution(use_sim_time).lower() in ("true", "1", "yes")
 
-        # 1) Start server (services enabled)
+        # ----------------------------
+        # Gazebo
+        # ----------------------------
         gz_server = ExecuteProcess(
             cmd=["gz", "sim", "-r", "-s", world_path],
-            output="screen",
+            output="screen"
         )
 
-        # 2) Start GUI (connect to server)
-        # Delay a bit so the server is already up.
         gz_gui = ExecuteProcess(
             cmd=["gz", "sim", "-g"],
-            output="screen",
+            output="screen"
         )
-        gz_gui_delayed = TimerAction(period=1.0, actions=[gz_gui])
 
-        # 3) Spawn robot (needs UserCommands system in the world)
         spawn_robot = Node(
             package="ros_gz_sim",
             executable="create",
@@ -86,20 +99,16 @@ def generate_launch_description():
                 "-x", context.perform_substitution(x),
                 "-y", context.perform_substitution(y),
                 "-z", context.perform_substitution(z),
-                "-R", "0", "-P", "0",
                 "-Y", context.perform_substitution(yaw),
             ],
         )
-        spawn_robot_delayed = TimerAction(period=3.0, actions=[spawn_robot])
 
-        # 4) Bridge
-        use_sim_time_str = context.perform_substitution(use_sim_time)
-        use_sim_time_bool = use_sim_time_str.strip().lower() in ("true", "1", "yes")
-
+        # ----------------------------
+        # Bridge
+        # ----------------------------
         bridge = Node(
             package="ros_gz_bridge",
             executable="parameter_bridge",
-            name="ros_gz_bridge",
             output="screen",
             arguments=[
                 "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
@@ -108,12 +117,38 @@ def generate_launch_description():
                 "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
                 "/camera@sensor_msgs/msg/Image[gz.msgs.Image",
                 "/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
+                "/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
             ],
             parameters=[{"use_sim_time": use_sim_time_bool}],
         )
-        bridge_delayed = TimerAction(period=4.0, actions=[bridge])
 
-        return [gz_server, gz_gui_delayed, spawn_robot_delayed, bridge_delayed]
+        # ----------------------------
+        # robot_state_publisher (TF ROS-pure)
+        # ----------------------------
+        pkg_desc = get_package_share_directory(context.perform_substitution(description_pkg))
+        xacro_path = os.path.join(pkg_desc, "urdf", context.perform_substitution(description_xacro))
+
+        robot_description = ParameterValue(
+            Command(["xacro ", xacro_path]),
+            value_type=str
+        )
+
+        rsp = Node(
+            package="robot_state_publisher",
+            executable="robot_state_publisher",
+            parameters=[
+                {"robot_description": robot_description},
+                {"use_sim_time": use_sim_time_bool},
+            ],
+            output="screen",
+        )
+
+        return [
+            gz_server,
+            TimerAction(period=1.0, actions=[gz_gui]),
+            TimerAction(period=3.0, actions=[spawn_robot]),
+            TimerAction(period=4.0, actions=[bridge, rsp]),
+        ]
 
     return LaunchDescription([
         declare_world,
@@ -121,5 +156,7 @@ def generate_launch_description():
         declare_model_name,
         declare_use_sim_time,
         declare_x, declare_y, declare_z, declare_yaw,
+        declare_description_pkg,
+        declare_description_xacro,
         OpaqueFunction(function=launch_setup),
     ])
