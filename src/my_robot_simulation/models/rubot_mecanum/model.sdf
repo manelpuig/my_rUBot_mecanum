@@ -213,7 +213,7 @@
     <!-- =========================
          Camera
          ========================= -->
-    <link name="camera_link">
+    <link name="camera">
       <pose relative_to="base_link">0.13 0 0.08 0 0 0</pose>
 
       <visual name="camera_visual">
@@ -247,7 +247,7 @@
     </link>
     <joint name="camera_joint" type="fixed">
       <parent>base_link</parent>
-      <child>camera_link</child>
+      <child>camera</child>
     </joint>
 
     <!-- =========================
@@ -273,19 +273,6 @@
 
       <!-- publish odom->base_link transform as Pose_V -->
       <tf_topic>/tf</tf_topic>
-    </plugin>
-
-    <!-- =========================
-         Link poses (base_link -> sensors, etc.)
-         ========================= -->
-    <plugin filename="gz-sim-pose-publisher-system"
-            name="gz::sim::systems::PosePublisher">
-      <publish_link_pose>true</publish_link_pose>
-      <publish_model_pose>true</publish_model_pose>
-      <use_pose_vector_msg>true</use_pose_vector_msg>
-      <update_frequency>50</update_frequency>
-      <static_publisher>true</static_publisher>
-      <static_update_frequency>1</static_update_frequency>
     </plugin>
 
   </model>

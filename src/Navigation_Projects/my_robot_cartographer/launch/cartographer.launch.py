@@ -10,10 +10,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    # --- Launch arguments ---
     use_sim_time = LaunchConfiguration("use_sim_time", default="true")
-
-    # In Docker, RViz commonly fails due to OpenGL/GLSL; keep it OFF by default.
     use_rviz = LaunchConfiguration("use_rviz", default="false")
 
     pkg_share = get_package_share_directory("my_robot_cartographer")
@@ -39,12 +36,9 @@ def generate_launch_description():
         output="screen",
         parameters=[{"use_sim_time": use_sim_time}],
         arguments=[
-            "-configuration_directory",
-            cartographer_config_dir,
-            "-configuration_basename",
-            configuration_basename,
+            "-configuration_directory", cartographer_config_dir,
+            "-configuration_basename", configuration_basename,
         ],
-        # Make scan topic explicit (avoids issues if node expects 'scan' without '/')
         remappings=[
             ("scan", "/scan"),
         ],
@@ -83,11 +77,11 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "use_sim_time",
             default_value="true",
-            description="Use simulation (Gazebo/gz-sim) clock if true",
+            description="Use simulation (gz-sim) clock if true",
         ),
         DeclareLaunchArgument(
             "use_rviz",
-            default_value="false",
+            default_value="true",
             description="Launch RViz2 if true (OFF by default for Docker OpenGL stability)",
         ),
         DeclareLaunchArgument(
@@ -100,8 +94,6 @@ def generate_launch_description():
             default_value=publish_period_sec,
             description="OccupancyGrid publishing period (seconds)",
         ),
-
-        # Order matters: publish TF alias first, then cartographer
         cartographer_node,
         occupancy_grid,
         rviz2,

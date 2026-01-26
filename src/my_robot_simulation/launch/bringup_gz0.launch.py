@@ -105,7 +105,6 @@ def generate_launch_description():
 
         # ----------------------------
         # Bridge
-        #   IMPORTANT: do NOT bridge /tf (avoids multiple TF trees)
         # ----------------------------
         bridge = Node(
             package="ros_gz_bridge",
@@ -113,13 +112,12 @@ def generate_launch_description():
             output="screen",
             arguments=[
                 "/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
-                "/cmd_vel_smoothed@geometry_msgs/msg/Twist]gz.msgs.Twist", # per nav2
                 "/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry",
                 "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
                 "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
                 "/camera@sensor_msgs/msg/Image[gz.msgs.Image",
                 "/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
-                #"/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V", 
+                "/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
             ],
             parameters=[{"use_sim_time": use_sim_time_bool}],
         )
@@ -145,43 +143,11 @@ def generate_launch_description():
             output="screen",
         )
 
-        # ----------------------------
-        # TF aliases for gz-scoped sensor frames
-        # ----------------------------
-        lidar_scoped = f"{spawn_name}/base_scan/lidar"
-        camera_scoped = f"{spawn_name}/camera/camera"
-
-        tf_lidar_alias = Node(
-            package="tf2_ros",
-            executable="static_transform_publisher",
-            output="screen",
-            arguments=[
-                "--x", "0", "--y", "0", "--z", "0",
-                "--roll", "0", "--pitch", "0", "--yaw", "0",
-                "--frame-id", "base_scan",
-                "--child-frame-id", lidar_scoped,
-            ],
-            parameters=[{"use_sim_time": use_sim_time_bool}],
-        )
-
-        tf_camera_alias = Node(
-            package="tf2_ros",
-            executable="static_transform_publisher",
-            output="screen",
-            arguments=[
-                "--x", "0", "--y", "0", "--z", "0",
-                "--roll", "0", "--pitch", "0", "--yaw", "0",
-                "--frame-id", "camera",
-                "--child-frame-id", camera_scoped,
-            ],
-            parameters=[{"use_sim_time": use_sim_time_bool}],
-        )
-
         return [
             gz_server,
             TimerAction(period=1.0, actions=[gz_gui]),
             TimerAction(period=3.0, actions=[spawn_robot]),
-            TimerAction(period=4.0, actions=[bridge, rsp, tf_lidar_alias, tf_camera_alias]),
+            TimerAction(period=4.0, actions=[bridge, rsp]),
         ]
 
     return LaunchDescription([

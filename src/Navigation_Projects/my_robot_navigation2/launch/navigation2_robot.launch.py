@@ -62,13 +62,6 @@ def generate_launch_description():
         parameters=[{'use_sim_time': use_sim_time}],
         output='screen'
     )
-    fake_odom_tf = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="fake_odom_to_base",
-        arguments=["0", "0", "0", "0", "0", "0", "odom", "base_footprint"],
-        output="screen",
-    )
 
     # Inclusió del fitxer de llançament principal de Nav2
     nav2_bringup_launch_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
@@ -94,6 +87,4 @@ def generate_launch_description():
 
         # Llançament de RViz2
         rviz_node,
-        #Test fake odom
-        fake_odom_tf,
     ])

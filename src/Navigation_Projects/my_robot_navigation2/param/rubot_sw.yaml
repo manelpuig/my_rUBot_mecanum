@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.2
     alpha4: 0.2
     alpha5: 0.2
-    base_frame_id: "base_footprint"
+    base_frame_id: "base_link"
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
@@ -52,7 +52,7 @@ bt_navigator:
     use_sim_time: True
 
     global_frame: map
-    robot_base_frame: base_footprint
+    robot_base_frame: base_link
     odom_topic: /odom
 
     bt_loop_duration: 10
@@ -82,8 +82,8 @@ docking_server:
   ros__parameters:
     use_sim_time: True
 
-    # Frames (en el teu cas, sense robot, tens odom->base_footprint fake)
-    base_frame: "base_footprint"
+    # Frames (en el teu cas, sense robot, tens odom->base_link fake)
+    base_frame: "base_link"
     fixed_frame: "odom"
 
     # Timeouts / freqüències (valors conservadors)
@@ -195,7 +195,7 @@ local_costmap:
       update_frequency: 5.0
       publish_frequency: 2.0
       global_frame: odom
-      robot_base_frame: base_footprint
+      robot_base_frame: base_link
       use_sim_time: True
       rolling_window: true
       width: 3
@@ -254,7 +254,7 @@ global_costmap:
       update_frequency: 1.0
       publish_frequency: 1.0
       global_frame: map
-      robot_base_frame: base_footprint
+      robot_base_frame: base_link
       use_sim_time: True
       robot_radius: 0.22
       resolution: 0.05
@@ -351,7 +351,7 @@ recoveries_server:
     wait:
       plugin: "nav2_recoveries/Wait"
     global_frame: odom
-    robot_base_frame: base_footprint
+    robot_base_frame: base_link
     transform_timeout: 0.1
     use_sim_time: True
     simulate_ahead_time: 2.0
@@ -400,7 +400,7 @@ collision_monitor:
     use_sim_time: True
     enabled: True
 
-    base_frame_id: "base_footprint"
+    base_frame_id: "base_link"
     odom_frame_id: "odom"
     transform_tolerance: 0.2
     source_timeout: 1.0
