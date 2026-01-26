@@ -41,7 +41,7 @@ def generate_launch_description():
 
     declare_x = DeclareLaunchArgument("x", default_value="0.0")
     declare_y = DeclareLaunchArgument("y", default_value="0.0")
-    declare_z = DeclareLaunchArgument("z", default_value="0.10")
+    declare_z = DeclareLaunchArgument("z", default_value="0.05")
     declare_yaw = DeclareLaunchArgument("yaw", default_value="0.0")
 
     # Robot description (ROS-pure)
