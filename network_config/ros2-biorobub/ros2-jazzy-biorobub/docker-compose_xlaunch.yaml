@@ -12,7 +12,6 @@ services:
     environment:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_DOMAIN_ID=1
-      - ROS_LOCALHOST_ONLY=0
 
       # LAB (Windows): recommended
       #- ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
