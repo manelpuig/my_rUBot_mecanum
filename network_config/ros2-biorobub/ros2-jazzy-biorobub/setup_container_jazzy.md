@@ -1,5 +1,12 @@
 # Setup ROS2 Jazzy Container environment
 
+- Clone the jazzy branch on PC host with VScode:
+    ````bash
+    git clone -b jazzy --single-branch https://github.com/manelpuig/my_rUBot_mecanum.git
+    cd my_rUBot_mecanum
+    git branch
+    git status
+    ````
 - Open a terminal in the `ros2-jazzy-biorobub` folder and run:
     ````bash
     docker compose -f docker-compose.win.yaml up -d
@@ -24,7 +31,7 @@
 
 - To stop the container:
     ````bash
-    docker compose down
+    docker compose -f docker-compose.win.yaml down
     ````
 - To see the Images and Containers:
     ````bash
