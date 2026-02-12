@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CycloneDDS xmlns="https://cdds.io/config">
+
+  <Domain id="any">
+
+    <General>
+      <!-- ========================================================= -->
+      <!-- HOME MODE (simulation, no robot, same PC or same subnet) -->
+      <!--   Use: spdp  (recommended) or true                       -->
+      <!-- LAB MODE (PC <-> rUBot, controlled unicast discovery)    -->
+      <!--   Use: false                                              -->
+      <!-- ========================================================= -->
+      <AllowMulticast>spdp</AllowMulticast>
+    </General>
+
+
+    <!-- ========================================================= -->
+    <!-- LAB MODE ONLY                                             -->
+    <!-- Uncomment this block to:                                  -->
+    <!--   1) Force the PC network interface (important if         -->
+    <!--      the PC has WiFi + Ethernet + VPN + Docker adapters)  -->
+    <!--   2) Define the robot IP as static peer (unicast DDS)     -->
+    <!--                                                            -->
+    <!-- Replace:                                                   -->
+    <!--   192.168.1.16  -> PC IP on the LAB router                -->
+    <!--   192.168.1.14  -> rUBot IP                                -->
+    <!-- ========================================================= -->
+
+    <!--
+    <Interfaces>
+      <NetworkInterface address="192.168.1.16" multicast="false"/>
+    </Interfaces>
+
+    <Discovery>
+      <Peers>
+        <Peer Address="192.168.1.14"/>
+      </Peers>
+    </Discovery>
+    -->
+
+  </Domain>
+
+</CycloneDDS>

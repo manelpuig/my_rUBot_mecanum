@@ -10,23 +10,43 @@ ENV DEBIAN_FRONTEND=noninteractive
 # ----------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # General utilities
-    curl wget ca-certificates lsb-release gnupg2 software-properties-common \
-    iputils-ping iproute2 net-tools \
-    git unzip \
+    curl \
+    wget \
+    gpg \
+    apt-transport-https \
+    ca-certificates \
+    lsb-release \
+    gnupg2 \
+    software-properties-common \
+    iputils-ping \
+    git \
+    unzip \
     # Build / ROS dev tools
-    build-essential cmake \
-    python3-pip python3-colcon-common-extensions \
-    python3-rosdep python3-vcstool python3-argcomplete \
-    # X11 / OpenGL helpers
-    x11-apps mesa-utils \
-    libgl1 libgl1-mesa-dri libglu1-mesa \
-    libxkbcommon-x11-0 libx11-6 libxext6 libxrender1 libxtst6 \
- && rm -rf /var/lib/apt/lists/*
+    build-essential \
+    cmake \
+    python3-colcon-common-extensions \
+    python3-pip \
+    # X11 graphical support (for RViz / Gazebo GUI via X11)
+    x11-apps \
+    libgl1 \
+    libgl1-mesa-dri \
+    libglu1-mesa \
+    mesa-utils \
+    libxkbcommon-x11-0 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------
 # 2) ROS 2 add-ons (Jazzy)
+#    Notes:
+#    - For Jazzy, "Gazebo Classic" is deprecated; use Gazebo (gz) + ros_gz.
+#    - Package availability can vary slightly by sync; keep this list lean + common.
 # ----------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Common robot description / GUI helpers
     ros-jazzy-joint-state-publisher \
     ros-jazzy-joint-state-publisher-gui \
     ros-jazzy-xacro \
@@ -34,19 +54,38 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-tf2-tools \
     ros-jazzy-rqt \
     ros-jazzy-rqt-common-plugins \
+    \
+    # Teleop
     ros-jazzy-teleop-twist-keyboard \
     ros-jazzy-joy \
     ros-jazzy-teleop-twist-joy \
+    \
+    # DDS / RMW
     ros-jazzy-rmw-cyclonedds-cpp \
+    \
+    # Navigation + SLAM (common stack)
     ros-jazzy-navigation2 \
     ros-jazzy-nav2-bringup \
     ros-jazzy-slam-toolbox \
+    \
+    # Programmatic navigation helper (if available in your apt repo sync)
+    # If apt complains it's missing, remove this line and use Nav2 actions directly.
     ros-jazzy-nav2-simple-commander \
+    \
+    # ROSBridge (optional, useful for web / remote UIs)
     ros-jazzy-rosbridge-server \
+    \
+    # Gazebo (gz) integration for ROS 2 (replaces igngazebo usage)
     ros-jazzy-ros-gz \
     ros-jazzy-ros-gz-sim \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
+# Networking tools (REQUIRED)
+RUN apt-get update && apt-get install -y \
+    iproute2 \
+    iputils-ping \
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
 # ----------------------------
 # Optional Python deps (keep minimal; uncomment if needed)
 # ----------------------------

@@ -7,31 +7,24 @@
     git branch
     git status
     ````
-- Open a terminal in the `ros2-jazzy-biorobub` folder and run:
+- Open a terminal in the `ros2-jazzy-biorobub` folder
+- Verify the `docker-compose_xlaunch.yaml` and `cyclonedds_pc.xml` files configuration in function of Home-simulation (Default) / Lab-rUBot use 
+- and run:
     ````bash
-    docker compose -f docker-compose.win.yaml up -d
-    docker exec -it pc_jazzy bash
-    code .                     # open VSCode inside the container
-    ros2 topic list
+    docker compose -f docker-compose_xlaunch.yaml up
     ````
+- In VScode `attach` to the `pc_jazzy` container
+
 - Open `.bashrc` file inside the container and verify it contains:
     ````bash
     source /opt/ros/jazzy/setup.bash
     source /root/my_rUBot_mecanum/install/setup.bash
-    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    export ROS_DOMAIN_ID=5 # robot number
-    export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST # Mode simulation
-    #export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF # Mode robot
-    #export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET # Mode Local Development
-    #export ROS_STATIC_PEERS="192.168.1.45" # Mode robot with robot IP
-    #export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml # Mode Local Development/robot
-    unset CYCLONEDDS_URI # Mode simulation
-    unset ROS_STATIC_PEERS # Mode simulation
+    cd /root/my_rUBot_mecanum
     ````
 
 - To stop the container:
     ````bash
-    docker compose -f docker-compose.win.yaml down
+    docker compose -f docker-compose_xlaunch.yaml down
     ````
 - To see the Images and Containers:
     ````bash
