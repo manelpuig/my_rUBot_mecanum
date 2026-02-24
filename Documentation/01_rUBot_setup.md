@@ -114,14 +114,6 @@ If you have Ubuntu22.04, follow instructions:
   cd my_rUBot_mecanum
   colcon build
   ````
-- Verify the NetworkInterface, type:
-    ````shell
-    ip -br link
-    ip -br addr
-    ip a
-    ````
-    > Usually `wlp1s0`
-- Verify the file `cyclonedds_pc.xml` contains the proper NetworkInterface
 - Open `.bashrc` file and verify it contains:
     ````bash
     # --- ROS 2 base ---
@@ -137,11 +129,9 @@ If you have Ubuntu22.04, follow instructions:
     export ROS_DOMAIN_ID=1 # Group number 1
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     export ROS_LOCALHOST_ONLY=0
-    # robust hotspot mode (recommended)
+    # robust hotspot mode
     export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF 
     export ROS_STATIC_PEERS=192.168.1.14  # robot IP (14,24,34 or 44)
-    # CycloneDDS XML (interface binding, peers, etc.)
-    export CYCLONEDDS_URI=file:///home/<your_user>/Desktop/my_rUBot_mecanum/network_config/humble/cyclonedds_pc.xml
     ````
     > Modify the path `/home/<your_user>/Desktop/` from your PC with <your_user> name
 

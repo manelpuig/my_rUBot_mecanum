@@ -1,36 +1,23 @@
-<?xml version='1.0'?>
-<sdf version='1.7'>
-  <model name='wall60cm'>
-    <pose>-0 0 0 0 0 0</pose>
-    <link name='Wall_4'>
-      <collision name='Wall_4_Collision'>
-        <geometry>
-          <box>
-            <size>0.6 0.05 0.3</size>
-          </box>
-        </geometry>
-        <pose>0 0 0.15 0 -0 0</pose>
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="wall60cm">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+
+    <link name="link">
+      <collision name="collision">
+        <geometry><box><size>0.6 0.05 0.3</size></box></geometry>
       </collision>
-      <visual name='Wall_4_Visual'>
-        <pose>0 0 0.15 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.6 0.05 0.3</size>
-          </box>
-        </geometry>
+
+      <visual name="visual">
+        <geometry><box><size>0.6 0.05 0.3</size></box></geometry>
         <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Wood</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
+          <ambient>0.45 0.30 0.15 1</ambient>
+          <diffuse>0.45 0.30 0.15 1</diffuse>
+          <specular>0.05 0.05 0.05 1</specular>
         </material>
-        <meta>
-          <layer>0</layer>
-        </meta>
       </visual>
-      <pose>0 0 0 0 0 0</pose>
     </link>
-    <static>1</static>
   </model>
 </sdf>
+

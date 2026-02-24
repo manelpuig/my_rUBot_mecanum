@@ -175,43 +175,36 @@ Review the joint and link definition in URDF model.
 The used Gazebo plugin is:
 
 ```xml
-  <!-- 2D Camera controller -->
+  <!-- 3D Camera controller -->
   <gazebo reference="camera">
-    <sensor name="camera1" type="camera">
-      <update_rate>30.0</update_rate>
-      <camera name="front">
-        <horizontal_fov>1.3962634</horizontal_fov>
-        <image>
-          <width>320</width>
-          <height>240</height>
-          <format>R8G8B8</format>
-        </image>
-        <clip>
-          <near>0.02</near>
-          <far>300</far>
-        </clip>
-      </camera>
-      <plugin filename="libgazebo_ros_camera.so" name="camera_controller">
-        <alwaysOn>true</alwaysOn>
-        <visualize>false</visualize>
-        <cameraName>rubot/camera1</cameraName>
-        <imageTopicName>image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <frameName>camera</frameName>
-        <hackBaseline>0.07</hackBaseline>
-        <distortionK1>0.0</distortionK1>
-        <distortionK2>0.0</distortionK2>
-        <distortionK3>0.0</distortionK3>
-        <distortionT1>0.0</distortionT1>
-        <distortionT2>0.0</distortionT2>
-      </plugin>
+    <sensor name="rubot_camera" type="depth">
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>1</visualize>
+        <camera name="rubot_camera">
+            <image>
+                <width>320</width>
+                <height>240</height>
+                <format>R8G8B8</format>
+            </image>
+            <clip>
+                <near>0.01</near>
+                <far>10.0</far>
+            </clip>
+        </camera>
+        <plugin filename="libgazebo_ros_camera.so" name="gazebo_ros_depth_camera_sensor">
+            <camera_name>camera</camera_name>
+            <frame_name>camera</frame_name>
+            <hack_baseline>0.07</hack_baseline>
+            <min_depth>0.001</min_depth>
+        </plugin>
     </sensor>
-  </gazebo>
+  </gazebo> 
   ```
 >To view the camera image you can:
 > - add the line in the plugin 
 > ```xml
-><visualize>true</visualize>"
+><visualize>1</visualize>"
 > ```
 > - use rviz
 > - type rqt in a terminal and select Plugins->Visualization->Image View
@@ -437,10 +430,10 @@ ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml robot:=limo/rubot_li
 
 - To see the Camera and Lidar messages published to the corresponding topics, execute the `display.launch.xml` file with `use_sim_time:=true` to use simulation (Gazebo) clock.
 ```shell
-ros2 launch my_robot_description display.launch.xml use_sim_time:=true robot_model:=limo/rubot_limo.urdf
+ros2 launch my_robot_description display.launch.xml use_sim_time:=true robot_model:=rubot/rubot_mecanum.urdf
 ```
-- In RVIZ, add the topics where Gazebo publish the Camera Images and Lidar information. For LIMO robot: 
-  - `/limo/limo_camera/image_raw` topic where Image message is published
+- In RVIZ, add the topics where Gazebo publish the Camera Images and Lidar information. For all robots: 
+  - `/camera/image_raw` topic where Image message is published
   - `/scan` topic where LaserScan message is published
 
 ![](./Images/02_rubot_model/06_topics_limo1.png)
@@ -451,7 +444,7 @@ ros2 launch my_robot_description display.launch.xml use_sim_time:=true robot_mod
 
 Ye have saved this RVIZ configuration in `urdf_lidar_cam.rviz` file and the bringup launch file `my_robot_bringup_sw_rviz.launch.xml` launch Gazebo and RVIZ with this configuration.
 ````shell
-ros2 launch my_robot_bringup my_robot_bringup_sw_rviz.launch.xml robot:=limo/rubot_limo.urdf x0:=0.5 y0:=0.5 yaw0:=1.57
+ros2 launch my_robot_bringup my_robot_bringup_sw_rviz.launch.xml robot:=rubot/rubot_mecanum.urdf x0:=0.5 y0:=0.5 yaw0:=1.57
 ````
 > The argument `use_sim_time` is by default true in this launch file
 
@@ -537,7 +530,7 @@ sudo apt install ros-humble-teleop-twist-keyboard
 When you are using the virtual environment to simulate the robot behavior you have to:
 - Bringup our robot in Gazebo virtual environment
   ````shell
-  ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
+  ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=0.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square3m_walls.world
   ````
   > The argument `use_sim_time` is by default true in this launch file
 

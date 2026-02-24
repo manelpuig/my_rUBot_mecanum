@@ -5,7 +5,7 @@
 
       <!-- Fixem explícitament la IP del PC -->
       <Interfaces>
-        <NetworkInterface address="192.168.1.6"/>
+        <NetworkInterface address="192.168.1.16"/>
       </Interfaces>
 
       <!-- Com que utilitzes ROS_AUTOMATIC_DISCOVERY_RANGE=OFF

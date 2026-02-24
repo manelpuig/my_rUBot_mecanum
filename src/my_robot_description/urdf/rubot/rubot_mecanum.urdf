@@ -257,9 +257,35 @@
             <joint_config>1 1 1 1</joint_config>
         </plugin>
   </gazebo>
-  <!-- 2D Camera controller -->
+  <!-- 3D Camera controller -->
   <gazebo reference="camera">
-    <sensor name="camera1" type="camera">
+    <sensor name="rubot_camera" type="depth">
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>1</visualize>
+        <camera name="rubot_camera">
+            <image>
+                <width>320</width>
+                <height>240</height>
+                <format>R8G8B8</format>
+            </image>
+            <clip>
+                <near>0.01</near>
+                <far>10.0</far>
+            </clip>
+        </camera>
+        <plugin filename="libgazebo_ros_camera.so" name="gazebo_ros_depth_camera_sensor">
+            <camera_name>camera</camera_name>
+            <frame_name>camera</frame_name>
+            <hack_baseline>0.07</hack_baseline>
+            <min_depth>0.001</min_depth>
+        </plugin>
+    </sensor>
+  </gazebo> 
+
+  <!-- 2D Camera controller 
+  <gazebo reference="camera">
+    <sensor name="camera" type="camera">
       <update_rate>30.0</update_rate>
       <camera name="front">
         <horizontal_fov>1.3962634</horizontal_fov>
@@ -281,46 +307,10 @@
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
         <frameName>camera</frameName>
         <hackBaseline>0.07</hackBaseline>
-        <distortionK1>0.0</distortionK1>
-        <distortionK2>0.0</distortionK2>
-        <distortionK3>0.0</distortionK3>
-        <distortionT1>0.0</distortionT1>
-        <distortionT2>0.0</distortionT2>
       </plugin>
     </sensor>
-  </gazebo> 
-  <!-- 3D Camera Orbbec Dabai 
-  <gazebo reference="camera">
-    <sensor name="rgbd_camera" type="depth">
-        <always_on>true</always_on>
-        <update_rate>30.0</update_rate>
+  </gazebo>-->
 
-        <camera>
-        <horizontal_fov>1.047</horizontal_fov>
-        <image>
-            <width>640</width>
-            <height>480</height>
-            <format>R8G8B8</format>
-        </image>
-        <clip>
-            <near>0.1</near>
-            <far>5.0</far>
-        </clip>
-        </camera>
-
-        <plugin name="rgbd_camera_controller"
-                filename="libgazebo_ros_depth_camera.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>30.0</updateRate>
-        <robotNamespace>camera1</robotNamespace>
-        <frameName>camera</frameName>
-        <imageTopicName>image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <depthImageTopicName>depth/image_raw</depthImageTopicName>
-        <pointCloudTopicName>points</pointCloudTopicName>
-        </plugin>
-    </sensor>
-  </gazebo> -->
   <!-- Laser Distance Sensor YDLIDAR X4 controller-->
   <gazebo reference="base_scan">
     <sensor name="lidar" type="ray">

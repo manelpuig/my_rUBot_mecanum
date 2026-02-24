@@ -1,6 +1,6 @@
 services:
   pc-humble:
-    image: manelpuig/ros2-humble-biorobub-pc:latest
+    image: manelpuig/ros2-humble-ub-biorob:latest
     container_name: pc_humble
 
     privileged: true
@@ -16,7 +16,7 @@ services:
 
       # --- Robust pair-only networking ---
       - ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
-      - ROS_STATIC_PEERS=192.168.1.64   # ⚠️ IP del robot (14,24,34,44)
+      - ROS_STATIC_PEERS=192.168.1.14   # ⚠️ IP del robot (14,24,34,44)
 
       # CycloneDDS XML (PC side)
       - CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml

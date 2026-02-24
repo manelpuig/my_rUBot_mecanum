@@ -1,136 +1,294 @@
 <?xml version="1.0" ?>
-<sdf version="1.9">
+<sdf version="1.8">
   <model name="rubot_mecanum">
     <static>false</static>
 
+    <!-- Pose del model al món (normalment 0 0 0 ...; el z el poses al world include/spawn) -->
+    <pose>0 0 0 0 0 0</pose>
+
     <!-- =========================
-         BASE LINK
+         Base
          ========================= -->
     <link name="base_link">
-      <pose>0 0 0 0 0 0</pose>
 
+      <!-- Inertial (aprox) -->
       <inertial>
-        <pose>0 0 0 0 0 0</pose>
         <mass>5.0</mass>
         <inertia>
-          <ixx>0.0104</ixx> <ixy>0</ixy> <ixz>0</ixz>
-          <iyy>0.0292</iyy> <iyz>0</iyz>
-          <izz>0.0375</izz>
+          <ixx>0.10</ixx> <ixy>0</ixy> <ixz>0</ixz>
+          <iyy>0.10</iyy> <iyz>0</iyz>
+          <izz>0.10</izz>
         </inertia>
       </inertial>
 
+      <!-- Base collision: caixa simple -->
       <collision name="base_collision">
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0.05 0 0 0</pose>
         <geometry>
-          <box>
-            <size>0.23 0.12 0.10</size>
-          </box>
+          <box><size>0.35 0.25 0.08</size></box>
         </geometry>
       </collision>
 
+      <!-- Base visual: mesh -->
       <visual name="base_visual">
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0.05 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://rubot_mecanum/meshes/rubot/base_link.stl</uri>
+            <uri>model://rubot_mecanum/meshes/base_link.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
-        <!-- Material opcional -->
         <material>
-          <ambient>0.8 0.8 0.0 1</ambient>
-          <diffuse>0.8 0.8 0.0 1</diffuse>
-          <specular>0.2 0.2 0.2 1</specular>
+          <ambient>1 1 0 1</ambient>
+          <diffuse>1 1 0 1</diffuse>
         </material>
       </visual>
+
     </link>
 
     <!-- =========================
-         CAMERA LINK (RGBD)
+         Wheels (fixed links)
          ========================= -->
-    <link name="camera">
-      <!-- Pose RELATIVA al model. Quedarà rigidament unida al base_link via joint -->
-      <pose>0.13 0 0.05 0 0 0</pose>
-
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>1e-5</ixx> <ixy>0</ixy> <ixz>0</ixz>
-          <iyy>1e-5</iyy> <iyz>0</iyz>
-          <izz>1e-5</izz>
-        </inertia>
-      </inertial>
-
-      <!-- Col·lisió simple (capseta) -->
-      <collision name="camera_collision">
-        <pose>0 0 0 0 0 0</pose>
+    <link name="upper_left_wheel">
+      <pose>0.07  0.10 0.05 0 0 0</pose>
+      <visual name="visual">
         <geometry>
-          <box>
-            <size>0.05 0.05 0.025</size>
-          </box>
-        </geometry>
-      </collision>
-
-      <!-- Visual simple (capseta) -->
-      <visual name="camera_visual">
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.05 0.05 0.025</size>
-          </box>
+          <mesh>
+            <uri>model://rubot_mecanum/meshes/upper_left_wheel.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
         </geometry>
         <material>
-          <ambient>0.1 0.1 0.1 1</ambient>
-          <diffuse>0.1 0.1 0.1 1</diffuse>
-          <specular>0.2 0.2 0.2 1</specular>
+          <ambient>0.2 0.2 0.2 1</ambient>
+          <diffuse>0.25 0.25 0.25 1</diffuse>
+        </material>
+      </visual>
+      <collision name="collision">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="upper_left_wheel_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>upper_left_wheel</child>
+    </joint>
+
+    <link name="upper_right_wheel">
+      <pose>0.07 -0.10 0.05 0 0 0</pose>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://rubot_mecanum/meshes/upper_right_wheel.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.2 0.2 0.2 1</ambient>
+          <diffuse>0.25 0.25 0.25 1</diffuse>
+        </material>
+      </visual>
+      <collision name="collision">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="upper_right_wheel_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>upper_right_wheel</child>
+    </joint>
+
+    <link name="lower_left_wheel">
+      <pose>-0.07  0.10 0.05 0 0 0</pose>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://rubot_mecanum/meshes/lower_left_wheel.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.2 0.2 0.2 1</ambient>
+          <diffuse>0.25 0.25 0.25 1</diffuse>
+        </material>
+      </visual>
+      <collision name="collision">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="lower_left_wheel_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>lower_left_wheel</child>
+    </joint>
+
+    <link name="lower_right_wheel">
+      <pose>-0.07 -0.10 0.05 0 0 0</pose>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://rubot_mecanum/meshes/lower_right_wheel.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.2 0.2 0.2 1</ambient>
+          <diffuse>0.25 0.25 0.25 1</diffuse>
+        </material>
+      </visual>
+      <collision name="collision">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="lower_right_wheel_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>lower_right_wheel</child>
+    </joint>
+
+    <!-- =========================
+         Lidar link + sensor
+         ========================= -->
+    <link name="base_scan">
+      <pose>0 0 0.2 0 0 0</pose>
+
+      <visual name="lidar_visual">
+        <geometry>
+          <mesh>
+            <uri>model://rubot_mecanum/meshes/Lidar.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.10 0.15 0.30 1</ambient>
+          <diffuse>0.15 0.25 0.55 1</diffuse>
+          <specular>0.30 0.30 0.35 1</specular>
         </material>
       </visual>
 
-      <!-- Sensor RGBD natiu Gazebo Sim -->
-      <sensor name="rgbd_camera" type="rgbd_camera">
+      <sensor name="lidar" type="gpu_lidar">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+
+        <!-- Ignition transport topic (ok per sim); per ROS bridge faràs el mapping -->
+        <topic>/scan</topic>
+
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.12</min>
+            <max>10.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </lidar>
+      </sensor>
+    </link>
+    <joint name="base_scan_joint" type="fixed">
+        <pose>0 0 0.2 0 0 0</pose>
+        <parent>base_link</parent>
+        <child>base_scan</child>
+    </joint>
+
+    <!-- =========================
+        Camera link + RGBD sensor
+        ========================= -->
+    <link name="camera">
+    <pose>0.13 0 0.15 0 0 0</pose>
+
+    <visual name="camera_visual">
+        <geometry>
+        <box><size>0.02 0.05 0.03</size></box>
+        </geometry>
+        <material>
+          <ambient>0.1 0.3 0.1 1</ambient>
+          <diffuse>0.1 0.7 0.1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+    </visual>
+
+    <!-- RGBD camera -->
+    <sensor name="rgbd_camera" type="rgbd_camera">
         <always_on>true</always_on>
         <update_rate>30</update_rate>
 
-        <!-- Base topic (Gazebo Transport) -->
-        <topic>/camera1</topic>
+        <!-- Base topic a Ignition -->
+        <topic>/camera</topic>
 
-        <!-- Opcional: renderitzat del frustum -->
-        <visualize>false</visualize>
+        <!-- RGB stream -->
+        <camera>
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+        </image>
+        <clip>
+            <near>0.02</near>
+            <far>5.0</far>
+        </clip>
+        </camera>
 
-        <rgbd_camera>
-          <camera>
-            <horizontal_fov>1.047</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
-              <format>R8G8B8</format>
-            </image>
-            <clip>
-              <near>0.1</near>
-              <far>5.0</far>
-            </clip>
-          </camera>
-
-          <depth_camera>
-            <clip>
-              <near>0.1</near>
-              <far>5.0</far>
-            </clip>
-          </depth_camera>
-        </rgbd_camera>
-      </sensor>
+        <!-- Depth stream -->
+        <depth_camera>
+        <clip>
+            <near>0.02</near>
+            <far>5.0</far>
+        </clip>
+        </depth_camera>
+    </sensor>
     </link>
 
-    <!-- =========================
-         FIXED JOINT
-         ========================= -->
     <joint name="camera_joint" type="fixed">
-      <parent>base_link</parent>
-      <child>camera</child>
-      <!-- si vols, pots fixar l'offset aquí en comptes del link pose -->
-      <!-- <pose>0.13 0 0.05 0 0 0</pose> -->
+    <pose>0.13 0 0.15 0 0 0</pose>
+    <parent>base_link</parent>
+    <child>camera</child>
     </joint>
+    <!-- =========================
+         Holonomic / planar velocity control (Twist)
+         ========================= -->
+    <plugin filename="libignition-gazebo6-velocity-control-system.so"
+            name="ignition::gazebo::systems::VelocityControl">
+      <topic>/cmd_vel</topic>
+    </plugin>
+
+    <!-- =========================
+         Odometry publisher
+         ========================= -->
+    <plugin filename="libignition-gazebo6-odometry-publisher-system.so"
+            name="ignition::gazebo::systems::OdometryPublisher">
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
 
   </model>
 </sdf>
