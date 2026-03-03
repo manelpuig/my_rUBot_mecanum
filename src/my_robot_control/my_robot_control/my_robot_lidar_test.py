@@ -14,7 +14,7 @@ class TwistLidarStop(Node):
         self.declare_parameter("vx", 0.3)
         self.declare_parameter("vy", 0.0)
         self.declare_parameter("w", 0.0)
-        self.declare_parameter("stop_distance", 0.3)
+        self.declare_parameter("stop_distance", 0.4)
 
         # Optional: limit FOV for detection
         self.declare_parameter("fov_min_deg", -150.0)
