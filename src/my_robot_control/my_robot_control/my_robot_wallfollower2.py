@@ -160,7 +160,7 @@ class WallFollower(Node):
 
             if abs(error) <= self.tol:
                 # Inside band: go straight
-                twist.linear.x = self.v_lin
+                twist.linear.x = self.v_lin 
                 twist.linear.y = 0.0
                 twist.angular.z = 0.0
                 action = (
@@ -171,9 +171,10 @@ class WallFollower(Node):
             elif error < 0:
                 # Too close to right wall → slow forward + stronger left turn
                 
-                twist.linear.x = self.v_lin * 0.5
-                twist.linear.y = 0.0
-                twist.angular.z = self.v_ang * 2.0
+                #twist.linear.x = self.v_lin
+                twist.linear.x = 0.0
+                twist.linear.y = 0.2 
+                twist.angular.z = 0.0
                 action = (
                     f"RIGHT too CLOSE ({min_right:.2f} m < "
                     f"{self.base_distance:.2f}-{self.tol:.2f}) → "
@@ -182,9 +183,9 @@ class WallFollower(Node):
 
             else:
                 # Too far from right wall → slow forward + stronger right turn
-                twist.linear.x = self.v_lin * 0.5
-                twist.linear.y = 0.0
-                twist.angular.z = -self.v_ang * 2.0
+                twist.linear.x = self.v_lin
+                twist.linear.y = -0.2
+                twist.angular.z = 0.0
                 action = (
                     f"RIGHT too FAR ({min_right:.2f} m > "
                     f"{self.base_distance:.2f}+{self.tol:.2f}) → "
@@ -199,7 +200,7 @@ class WallFollower(Node):
         ):
             twist.linear.x = self.v_lin * 0.1
             twist.linear.y = 0.0
-            twist.angular.z = -2.0 * self.v_ang
+            twist.angular.z = -1.5 * self.v_ang
             action = (
                 f"BACK-RIGHT {min_back_right:.2f} m → "
                 f"very slow + STRONG RIGHT turn (2*w)"

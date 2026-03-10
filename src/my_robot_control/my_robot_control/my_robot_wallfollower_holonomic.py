@@ -170,7 +170,6 @@ class WallFollower(Node):
 
             elif error < 0:
                 # Too close to right wall → slow forward + stronger left turn
-                
                 twist.linear.x = self.v_lin * 0.5
                 twist.linear.y = 0.0
                 twist.angular.z = self.v_ang * 2.0
