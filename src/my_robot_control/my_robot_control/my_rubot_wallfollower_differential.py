@@ -128,9 +128,9 @@ class WallFollower(Node):
 
             ang = angle_min + i * angle_inc
 
-            if   -20  <= ang <=  20:
+            if  -20  <= ang <=  20:
                 min_front = min(min_front, d)
-            elif  20  <  ang <= 110:
+            elif 20  <  ang <= 110:
                 min_left = min(min_left, d)
             elif -70  <= ang <  -20:
                 min_fr_right = min(min_fr_right, d)
@@ -158,9 +158,12 @@ class WallFollower(Node):
         # RULE 2: FRONT-RIGHT obstacle → slow + left
         #----------------------------------------------------------
         elif min_fr_right < self.base_distance:
-            twist.linear.x = 0.0
+            twist.linear.x = self.v_lin
             twist.linear.y = 0.0
-            twist.angular.z = self.v_ang * 2.0
+            twist.angular.z = 0.0
+            # if the front is very FAR go straight else turn left
+            if min_front < self.base_distance + self.tol:
+                twist.angular.z = self.v_ang * 2.0
             action = f"FRONT-RIGHT {min_fr_right:.2f} m → turn LEFT"
 
         #----------------------------------------------------------
@@ -184,7 +187,7 @@ class WallFollower(Node):
                 # Too close to right wall → slow forward + stronger left turn
                 
                 #twist.linear.x = self.v_lin
-                twist.linear.x = 0.15 * self.v_lin 
+                twist.linear.x = 0.5* self.v_lin 
                 twist.linear.y = 0.0
                 twist.angular.z = self.v_ang
                 action = (
@@ -195,7 +198,7 @@ class WallFollower(Node):
 
             else:
                 # Too far from right wall → slow forward + stronger right turn
-                twist.linear.x = 0.15*self.v_lin
+                twist.linear.x = 0.5*self.v_lin
                 twist.linear.y = 0.0
                 twist.angular.z = -self.v_ang
                 action = (
