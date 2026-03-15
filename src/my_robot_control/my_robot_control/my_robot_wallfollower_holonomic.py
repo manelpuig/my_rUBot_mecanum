@@ -19,7 +19,7 @@ class WallFollower(Node):
         self.declare_parameter('lateral_speed',  0.1)  # linear y (holonomic) speed
         self.declare_parameter('turn_speed',     0.4)  # angular speed (front avoidance)
         self.declare_parameter('time_to_stop',   30.0)  # auto-stop
-        self.declare_parameter('tolerance',      0.05)  # dead-band around target distance
+        self.declare_parameter('tolerance',      0.03)  # dead-band around target distance
         self.declare_parameter('limit_wall',    0.15)   # max valid distance to consider a wall 
 
         self.base_distance = float(self.get_parameter('distance_limit').value)
@@ -144,9 +144,10 @@ class WallFollower(Node):
                 twist.angular.z = 0.0                
                 action = f"LEFT {min_fr_left:.2f} m & RIGHT {min_fr_right:.2f} m → BACKWARD"
 
-        # ── RULE 2: FRONT left → Avoid front left obstacle ──
+        # ── RULE 1: FRONT left → Avoid front left obstacle ──
         elif min_distance == min_fr_left:
-            if min_fr_left < self.base_distance:
+            
+            if min_front < self.base_distance and min_fr_left < self.base_distance:
                 # demasiado cerca
                 twist.linear.x = 0.0
                 twist.linear.y = 0.0
@@ -159,12 +160,11 @@ class WallFollower(Node):
                 twist.angular.z = 0.0
                 action = f"FRONT-LEFT too far {min_fr_left:.2f} m → STRAIGHT + SLIDE RIGHT"
         
-        # ── RULE 1: FRONT obstacle → turn left (priority avoidance) ──
+        # ── RULE 2: FRONT obstacle → turn left (priority avoidance) ──
         elif min_distance == min_front:
             if min_front < self.limit_wall:
                 # Massa aprop de la paret reculem
                 twist.linear.x = -self.v_lin
-                
                 if math.isfinite(min_left) and min_left > self.limit_wall:
                     # no xoquem amb paret esquerra
                     twist.linear.y = self.v_lin
@@ -185,47 +185,48 @@ class WallFollower(Node):
             else:
                 # Busquem la paret detectada al front per acostar-nos-hi
                 twist.linear.x = self.v_lin
-                twist.linear.y = 0.0
+                twist.linear.y = -self.v_lat
                 twist.angular.z = 0.0
                 action = f"FRONT {min_front:.2f} m → STRAIGHT {min_right:.2f} m"
 
-        # ── RULE 2: FRONT-RIGHT obstacle → turn left ──
+        # ── RULE 3: FRONT-RIGHT obstacle → turn left ──
         elif min_distance == min_fr_right:
-            if min_fr_right < self.base_distance:
-                # demasiado cerca
-                twist.angular.z = self.v_ang * 2.0
-                action = f"FRONT-RIGHT {min_fr_right:.2f} m → turn LEFT"
-            else:
-                # demasiado lejos
+            if min_front < self.base_distance and min_fr_right < self.limit_wall:
                 twist.linear.x = -self.v_lin
                 twist.linear.y = self.v_lat
                 twist.angular.z = 0.0
                 action = f"FRONT-RIGHT too far {min_fr_right:.2f} m → BACKWARD + SLIDE LEFT"
+            elif min_fr_right < self.base_distance:
+                # demasiado cerca
+                twist.angular.z = self.v_ang * 2.0
+                action = f"FRONT-RIGHT {min_fr_right:.2f} m → turn LEFT"
 
         elif min_distance == min_right:
-            # ── RULE 3: RIGHT visible → holonomic lateral correction ──
+            # ── RULE 4: RIGHT visible → holonomic lateral correction ──
             if math.isfinite(min_right):
                 error = min_right - self.base_distance   # >0 too far, <0 too close
                 scale = min(2.0, abs(error) / self.tol)
                 if abs(error) <= self.tol:
                     twist.linear.x = self.v_lin
-                    twist.linear.y = 0.0
+                    twist.linear.y = -self.v_lat * scale * 1.5
                     twist.angular.z = 0.0
                     action = f"RIGHT OK ({min_right:.2f} m) → STRAIGHT"
 
                 elif error < 0:
                     # Too close → slide LEFT (positive y) while moving forward
+                    twist.linear.x = self.v_lin
                     twist.linear.y = self.v_lat * scale
                     twist.angular.z = self.v_ang
                     action = f"RIGHT CLOSE ({min_right:.2f} m) → forward + slide LEFT"
 
                 else:
                     # Too far → slide RIGHT (negative y) while moving forward
+                    twist.linear.x = self.v_lin
                     twist.linear.y = -self.v_lat * scale
                     twist.angular.z = -4.0*self.v_ang
                     action = f"RIGHT FAR ({min_right:.2f} m) → forward + slide RIGHT"
         
-        # ── RULE 4: BACK-RIGHT → forward + slide right to reacquire wall ──
+        # ── RULE 5: BACK-RIGHT → forward + slide right to reacquire wall ──
         elif math.isfinite(min_back_right):
             #twist.linear.x = self.v_lin
             twist.linear.x=0.0
