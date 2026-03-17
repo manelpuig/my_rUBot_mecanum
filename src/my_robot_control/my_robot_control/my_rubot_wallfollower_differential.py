@@ -135,7 +135,7 @@ class WallFollower(Node):
             elif -70  <= ang <  -20:
                 min_fr_right = min(min_fr_right, d)
             elif -110 <= ang <  -70:
-                min_fr_right = min(min_fr_right, d)
+                min_right = min(min_right, d)
             elif -160 <= ang < -110:
                 min_back_right = min(min_back_right, d)
             elif ang < -160 or ang > 160:

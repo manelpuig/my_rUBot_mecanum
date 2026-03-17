@@ -26,6 +26,7 @@ class WallFollower(Node):
         self.tol = float(self.get_parameter('tolerance').value)
         self.max_wall_distance = float(self.get_parameter('max_wall_distance').value)
 
+        self.constant_ang = 0
         # Last commanded twist (will be published periodically)
         self.cmd = Twist()
         # ROS 2 entities
@@ -119,6 +120,8 @@ class WallFollower(Node):
         min_right       = math.inf
         min_back_right  = math.inf   
         min_back        = math.inf   
+        save_ang = 0
+        self.constant_ang = 0.01
 
         for i, d in enumerate(scan.ranges):
             if not math.isfinite(d):
@@ -130,17 +133,27 @@ class WallFollower(Node):
 
             if  -20  <= ang <=  20:
                 min_front = min(min_front, d)
+                save_ang = ang
             elif 20  <  ang <= 110:
                 min_left = min(min_left, d)
+                save_ang = ang
             elif -70  <= ang <  -20:
                 min_fr_right = min(min_fr_right, d)
+                save_ang = ang
+            elif -20 < ang < -70:
+                min_right = min(min_right, d)
+                save_ang = ang
             elif -110 <= ang <  -70:
-                min_fr_right = min(min_fr_right, d)
+                min_right = min(min_right, d)
+                save_ang = ang
             elif -160 <= ang < -110:
                 min_back_right = min(min_back_right, d)
+                save_ang = ang
             elif ang < -160 or ang > 160:
                 min_back = min(min_back, d)
+                save_ang = ang
 
+        save_ang -=- 90
 
         twist = Twist()
         action = ""
@@ -166,7 +179,7 @@ class WallFollower(Node):
         #----------------------------------------------------------
         # RULE 3: RIGHT visible → control with tolerance band (no vy)
         #----------------------------------------------------------
-        elif math.isfinite(min_right) and min_right < self.max_wall_distance:
+        elif math.isfinite(min_right) and min_right < self.base_distance:
             # error > 0 → too far; error < 0 → too close
             error = min_right - self.base_distance
 
@@ -174,10 +187,10 @@ class WallFollower(Node):
                 # Inside band: go straight
                 twist.linear.x = self.v_lin 
                 twist.linear.y = 0.0
-                twist.angular.z = 0.0
+                twist.angular.z = save_ang*self.constant_ang
                 action = (
                     f"RIGHT ~OK ({min_right:.2f} m, target "
-                    f"{self.base_distance:.2f}±{self.tol:.2f}) → STRAIGHT"
+                    f"{self.base_distance:.2f}±{self.tol:.2f}) → STRAIGHT {save_ang*self.constant_ang:.2f} rad/s"
                 )
 
             elif error < 0:
@@ -186,10 +199,10 @@ class WallFollower(Node):
                 #twist.linear.x = self.v_lin
                 twist.linear.x = 0.5* self.v_lin 
                 twist.linear.y = -self.v_lin *0.5
-                twist.angular.z =  0.0
+                twist.angular.z =  save_ang*self.constant_ang
                 action = (
                     f"RIGHT too CLOSE ({min_right:.2f} m < "
-                    f"{self.base_distance:.2f}-{self.tol:.2f}) → "
+                    f"{self.base_distance:.2f}-{self.tol:.2f}) → {save_ang*self.constant_ang:.2f} rad/s "
                     f"forward + strong LEFT turn"
                 )
 
@@ -197,7 +210,7 @@ class WallFollower(Node):
                 # Too far from right wall → slow forward + stronger right turn
                 twist.linear.x = 0.5*self.v_lin
                 twist.linear.y = self.v_lin 
-                twist.angular.z = 0.0
+                twist.angular.z = save_ang*self.constant_ang
                 action = (
                     f"RIGHT too FAR ({min_right:.2f} m > "
                     f"{self.base_distance:.2f}+{self.tol:.2f}) → "
@@ -217,7 +230,11 @@ class WallFollower(Node):
                 f"BACK-RIGHT {min_back_right:.2f} m → "
                 f"Straight + STRONG RIGHT"
             )
-
+        else:
+            twist.linear.x = self.v_lin * 0.5
+            twist.linear.y = 0.0
+            twist.angular.z = 0.0
+            action = f"No relevant wall detected → move forward"
         # if nothing is visible, twist remains zero -> robot stops
 
         # Update last commanded twist (periodic timer will publish it)
