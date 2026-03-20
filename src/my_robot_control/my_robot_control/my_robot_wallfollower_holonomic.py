@@ -93,6 +93,10 @@ class WallFollower(Node):
             except Exception:
                 pass
 
+    #-----IMPORTANT EN GIRS PER NO DEPAR---------------------------------------------------------------
+    def _clamp(self, value, low, high):
+        return min(high, max(low, value))
+
     #--------------------------------------------------------------------
     def cmd_publish_timer_cb(self):
         """Periodic publisher: send the latest cmd_vel at 10 Hz."""
@@ -170,9 +174,12 @@ class WallFollower(Node):
         # RULE 1: FRONT obstacle → turn left
         #----------------------------------------------------------
         if min_front < self.base_distance:
-            twist.linear.x = 0.0
-            twist.linear.y = self.v_lin
+            # clamp prevent excessive velocity on turn speed
+            front_save_ang = self._clamp(front_save_ang, -self.v_ang, self.v_ang)
+
+            twist.linear.y = self.v_lin *0.2 #reduction to win space in turn
             twist.angular.z = front_save_ang
+
             action = f"FRONT {min_front:.2f} m → SLIDE LEFT + turn LEFT {front_save_ang:.2f}"
 
         #----------------------------------------------------------
@@ -190,6 +197,8 @@ class WallFollower(Node):
         elif math.isfinite(min_right) and min_right < self.base_distance:
             # error > 0 → too far; error < 0 → too close
             error = min_right - self.base_distance
+            # clamp prevent excessive velocity on turn speed
+            right_save_ang = self._clamp(right_save_ang, -self.v_ang, self.v_ang)
 
             if abs(error) <= self.tol:
                 # Inside band: go straight
@@ -197,8 +206,8 @@ class WallFollower(Node):
                 twist.linear.y = 0.0
                 twist.angular.z = right_save_ang
                 action = (
-                    f"RIGHT ~OK ({min_right:.2f} m, target {self.K}"
-                    f"{self.base_distance:.2f}±{self.tol:.2f}) → STRAIGHT {angle_orig:.2f} º -> ang_vel {twist.angular.z:.2f} "
+                    f"RIGHT ~OK ({min_right:.2f} m, target "
+                    f"{self.base_distance:.2f}±{self.tol:.2f}) → STRAIGHT {angle_orig:.2f} º + turn vel {twist.angular.z:.2f} "
                 )
 
             elif error < 0:
@@ -209,8 +218,8 @@ class WallFollower(Node):
                 twist.angular.z =  right_save_ang #velocitat negativa
                 action = (
                     f"RIGHT too CLOSE ({min_right:.2f} m < "
-                    f"{self.base_distance:.2f}-{self.tol:.2f}) → {angle_orig:.2f} º {twist.angular.z:.2f}"
-                    f"forward + strong LEFT turn {self.K}"
+                    f"{self.base_distance:.2f}-{self.tol:.2f}) → {angle_orig:.2f} º turn speed{twist.angular.z:.2f} "
+                    f"forward + strong LEFT + turn {-self.v_ang:2.2f} max"
                 )
 
             else:
@@ -221,7 +230,7 @@ class WallFollower(Node):
                 action = (
                     f"RIGHT too FAR ({min_right:.2f} m > "
                     f"{self.base_distance:.2f}+{self.tol:.2f}) → angle {angle_orig:.2f} º {twist.angular.z:.2f}"
-                    f"forward + strong RIGHT turn {self.K}"
+                    f"forward + strong RIGHT + turn"
                 )
 
         #----------------------------------------------------------
@@ -244,7 +253,7 @@ class WallFollower(Node):
             not math.isfinite(min_right) or min_back <= min_right
         ):
             twist.linear.x = 0.0
-            twist.linear.y = -self.v_lin * 0.5
+            twist.linear.y = -self.v_lin
             twist.angular.z = 0.0
             action = (
                 f"BACK {min_back:.2f} m → "
@@ -259,7 +268,7 @@ class WallFollower(Node):
                 f"No wall detected {min_back_right:.2f} m → "
                 f"Straight + SLIDE RIGHT"
             )
-            
+
         # if nothing is visible, twist remains zero -> robot stops
         # Update last commanded twist (periodic timer will publish it)
         self.cmd = twist
