@@ -120,7 +120,8 @@ class WallFollower(Node):
         min_right       = math.inf
         min_back_right  = math.inf   
         min_back        = math.inf   
-        save_ang = 0
+        right_save_ang = 0
+        front_save_ang=0
         # el twist.angular.z treballa amb radians: https://robotics.stackexchange.com/questions/94072/units-of-twist-angular-z
         self.K = 0.5 
         self.constant_ang = self.K*math.pi/180 # constant d'aprenentatge + factor conversio
@@ -134,16 +135,19 @@ class WallFollower(Node):
             ang = angle_min + i * angle_inc
 
             if  -20  <= ang <=  20:
-                min_front = min(min_front, d)
+                if min_front > d:
+                    min_front = d
+                    front_save_ang = ang
             elif 70  <  ang <= 110:
                 min_left = min(min_left, d)
-            elif -70  <= ang <  -20:
+            elif -60  <= ang <  -20:
                 min_fr_right = min(min_fr_right, d)
-            elif -110 <= ang <  -70:
+            elif -120 <= ang <  -60:
                 if min_right > d:
                     min_right = d
-                    save_ang = ang #calculem l'angle
-            elif -160 <= ang < -110:
+                    right_save_ang = ang #calculem l'angle
+                    
+            elif -160 <= ang < -120:
                 min_back_right = min(min_back_right, d)
             elif ang < -160 or ang > 160:
                 min_back = min(min_back, d)
@@ -151,10 +155,14 @@ class WallFollower(Node):
         # angle negatiu -> sentit horari -> s'apropa  a paret
         # angle positiu -> sentit antihorari -> s'allunya de la paret
         # -90 graus perquè el right està entre -70 i -110 graus. Per tant -90º   es la meitat
-        angle_orig = save_ang
-        save_ang =  save_ang - (-90) 
-        save_ang = save_ang * self.constant_ang # convertim a radians
+        angle_orig = right_save_ang
+        right_save_ang =  right_save_ang - (-90) 
+        right_save_ang = right_save_ang * self.constant_ang # convertim a radians
         
+
+        front_save_ang =  front_save_ang - (-90) 
+        front_save_ang= front_save_ang * self.constant_ang
+
         twist = Twist()
         action = ""
 
@@ -164,8 +172,8 @@ class WallFollower(Node):
         if min_front < self.base_distance:
             twist.linear.x = 0.0
             twist.linear.y = self.v_lin
-            twist.angular.z = 0.0
-            action = f"FRONT {min_front:.2f} m → SLIDE LEFT"
+            twist.angular.z = front_save_ang
+            action = f"FRONT {min_front:.2f} m → SLIDE LEFT + turn LEFT {front_save_ang:.2f}"
 
         #----------------------------------------------------------
         # RULE 2: FRONT-RIGHT obstacle → slow + left
@@ -187,7 +195,7 @@ class WallFollower(Node):
                 # Inside band: go straight
                 twist.linear.x = self.v_lin 
                 twist.linear.y = 0.0
-                twist.angular.z = save_ang
+                twist.angular.z = right_save_ang
                 action = (
                     f"RIGHT ~OK ({min_right:.2f} m, target {self.K}"
                     f"{self.base_distance:.2f}±{self.tol:.2f}) → STRAIGHT {angle_orig:.2f} º -> ang_vel {twist.angular.z:.2f} "
@@ -197,8 +205,8 @@ class WallFollower(Node):
                 # Too close to right wall → slow forward + stronger left turn
                 #twist.linear.x = self.v_lin
                 twist.linear.x = 0.5* self.v_lin 
-                twist.linear.y =-self.tol *0.5
-                twist.angular.z =  save_ang #velocitat negativa
+                twist.linear.y =self.v_lin*0.5
+                twist.angular.z =  right_save_ang #velocitat negativa
                 action = (
                     f"RIGHT too CLOSE ({min_right:.2f} m < "
                     f"{self.base_distance:.2f}-{self.tol:.2f}) → {angle_orig:.2f} º {twist.angular.z:.2f}"
@@ -208,8 +216,8 @@ class WallFollower(Node):
             else:
                 # Too far from right wall → slow forward + stronger right turn
                 twist.linear.x = 0.5*self.v_lin
-                twist.linear.y = self.tol 
-                twist.angular.z = save_ang
+                twist.linear.y = -self.v_lin*0.5
+                twist.angular.z = right_save_ang
                 action = (
                     f"RIGHT too FAR ({min_right:.2f} m > "
                     f"{self.base_distance:.2f}+{self.tol:.2f}) → angle {angle_orig:.2f} º {twist.angular.z:.2f}"
@@ -229,6 +237,20 @@ class WallFollower(Node):
                 f"BACK-RIGHT {min_back_right:.2f} m → "
                 f"Straight + STRONG RIGHT"
             )
+        #----------------------------------------------------------
+        # RULE 5: BACK → only if it is the most relevant wall
+        #----------------------------------------------------------
+        elif math.isfinite(min_back) and (
+            not math.isfinite(min_right) or min_back <= min_right
+        ):
+            twist.linear.x = 0.0
+            twist.linear.y = -self.v_lin * 0.5
+            twist.angular.z = 0.0
+            action = (
+                f"BACK {min_back:.2f} m → "
+                f"Straight + STRONG RIGHT"
+            )
+        
         else:
             twist.linear.x = self.v_lin 
             twist.linear.y = -self.v_lin
@@ -237,6 +259,7 @@ class WallFollower(Node):
                 f"No wall detected {min_back_right:.2f} m → "
                 f"Straight + SLIDE RIGHT"
             )
+            
         # if nothing is visible, twist remains zero -> robot stops
         # Update last commanded twist (periodic timer will publish it)
         self.cmd = twist
