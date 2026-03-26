@@ -26,7 +26,12 @@ class WallFollower(Node):
         self.tol = float(self.get_parameter('tolerance').value)
         self.max_wall_distance = float(self.get_parameter('max_wall_distance').value)
 
-        self.constant_ang = 0
+        # el twist.angular.z treballa amb radians: https://robotics.stackexchange.com/questions/94072/units-of-twist-angular-z
+        self.K = 0.5 
+        self.constant_ang = self.K*math.pi/180 # constant d'aprenentatge + factor conversio
+        self.front_save_ang = 20
+        self.larg_wall = False
+
         # Last commanded twist (will be published periodically)
         self.cmd = Twist()
         # ROS 2 entities
@@ -42,11 +47,22 @@ class WallFollower(Node):
             self.laser_callback,
             scan_qos,
         )
-        self.publisher = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.contador_gir = 0
+        self.max_time = 3.0
+        self.increase = 0
+        self.lenght_wall = False
 
+        self.publisher = self.create_publisher(Twist, '/cmd_vel', 10)
         # Timers
         self.info_timer = self.create_timer(1.0, self.log_info)
         self.stop_timer = self.create_timer(0.05, self.stop_watchdog)
+        
+        self.contador = 0
+        self.time_back = 0
+        self.actual_time = 0
+        
+        self.contar_timer = self.create_timer(1.0, self.still_rotate)
+        self.check_wall = self.create_timer(1.0, self.check)
 
         # Periodic cmd_vel publisher at 10 Hz (0.1 s)
         self.cmd_timer = self.create_timer(0.1, self.cmd_publish_timer_cb)
@@ -108,7 +124,40 @@ class WallFollower(Node):
         except Exception:
             # If the context or publisher is invalid, ignore
             pass
+    
+    def twist_front(self, front_save_ang):
 
+        twist = Twist()
+        twist.linear.y = 0.0 
+        twist.angular.z = front_save_ang
+
+        return twist
+    
+    def check(self):
+        """Check if the node is still active."""
+        # Guardar estat resetejar timer.
+
+        if abs(self.front_save_ang) <= 1.0:
+            if self.contador >3:
+                self.get_logger().info("Reset timer: FRONT obstacle detected.")
+                self.front_save_ang = 20
+                self.larg_wall = True
+                self.contador_gir=10
+            else:
+                self.contador += 1
+
+        return not self._shutting_down
+    def still_rotate(self):
+        """Check if the node is still active."""
+        # Guardar estat resetejar timer.
+        if self.larg_wall:
+            self.contador = 0
+            if self.contador_gir > 0:
+                self.contador_gir -= 1
+            else:
+                self.larg_wall = False
+
+            
     #--------------------------------------------------------------------
     def laser_callback(self, scan):
         """Compute control action from LIDAR and update self.cmd."""
@@ -126,9 +175,7 @@ class WallFollower(Node):
         min_back        = math.inf   
         right_save_ang = 0
         front_save_ang=0
-        # el twist.angular.z treballa amb radians: https://robotics.stackexchange.com/questions/94072/units-of-twist-angular-z
-        self.K = 0.5 
-        self.constant_ang = self.K*math.pi/180 # constant d'aprenentatge + factor conversio
+
 
         for i, d in enumerate(scan.ranges):
             if not math.isfinite(d):
@@ -155,7 +202,8 @@ class WallFollower(Node):
                 min_back_right = min(min_back_right, d)
             elif ang < -160 or ang > 160:
                 min_back = min(min_back, d)
-        
+        # backleft
+
         # angle negatiu -> sentit horari -> s'apropa  a paret
         # angle positiu -> sentit antihorari -> s'allunya de la paret
         # -90 graus perquè el right està entre -70 i -110 graus. Per tant -90º   es la meitat
@@ -164,28 +212,32 @@ class WallFollower(Node):
         right_save_ang = right_save_ang * self.constant_ang # convertim a radians
         
 
-        front_save_ang =  front_save_ang - (-90) 
+        front_save_ang =  front_save_ang - (0) # ha de ser 0 
         front_save_ang= front_save_ang * self.constant_ang
 
         twist = Twist()
-        action = ""
+
+        if self.larg_wall: 
+            self.contador = 0
+            twist.angular.z = self.v_ang
+            action = f"LARG WALL FRONT {min_front:.2f} m →  turn LEFT {self.v_ang:.2f}"
 
         #----------------------------------------------------------
         # RULE 1: FRONT obstacle → turn left
         #----------------------------------------------------------
-        if min_front < self.base_distance:
+        elif min_front < self.base_distance:
             # clamp prevent excessive velocity on turn speed
-            front_save_ang = self._clamp(front_save_ang, -self.v_ang, self.v_ang)
+            twist.linear.y = self.v_lin 
+            twist.angular.z =  front_save_ang 
 
-            twist.linear.y = self.v_lin *0.2 #reduction to win space in turn
-            twist.angular.z = front_save_ang
-
-            action = f"FRONT {min_front:.2f} m → SLIDE LEFT + turn LEFT {front_save_ang:.2f}"
+            self.front_save_ang = front_save_ang
+            action = f"FRONT {min_front:.2f} m → SLIDE LEFT + turn  {front_save_ang:.2f}"
 
         #----------------------------------------------------------
         # RULE 2: FRONT-RIGHT obstacle → slow + left
         #----------------------------------------------------------
         elif min_fr_right < self.base_distance and min_right > min_fr_right:
+            self.contador = 0
             twist.linear.x = self.v_lin*0.5
             twist.linear.y = self.v_lin*0.5
             twist.angular.z = 0.0
@@ -195,6 +247,7 @@ class WallFollower(Node):
         # RULE 3: RIGHT visible → control with tolerance band (no vy)
         #----------------------------------------------------------
         elif math.isfinite(min_right) and min_right < self.base_distance:
+            self.contador = 0
             # error > 0 → too far; error < 0 → too close
             error = min_right - self.base_distance
             # clamp prevent excessive velocity on turn speed
@@ -239,19 +292,22 @@ class WallFollower(Node):
         elif math.isfinite(min_back_right) and (
             not math.isfinite(min_right) or min_back_right <= min_right
         ):
+            self.contador = 0
             twist.linear.x = self.v_lin * 0.2
-            twist.linear.y = -self.v_lin * 0.5
+            twist.linear.y = -self.v_lin * 0.5 # back-right girar una mica
             twist.angular.z = 0.0
             action = (
                 f"BACK-RIGHT {min_back_right:.2f} m → "
                 f"Straight + STRONG RIGHT"
             )
+        
         #----------------------------------------------------------
         # RULE 5: BACK → only if it is the most relevant wall
         #----------------------------------------------------------
         elif math.isfinite(min_back) and (
             not math.isfinite(min_right) or min_back <= min_right
         ):
+            self.contador = 0
             twist.linear.x = 0.0
             twist.linear.y = -self.v_lin
             twist.angular.z = 0.0
@@ -261,6 +317,7 @@ class WallFollower(Node):
             )
         
         else:
+            self.contador = 0
             twist.linear.x = self.v_lin 
             twist.linear.y = -self.v_lin
             twist.angular.z = 0.0
