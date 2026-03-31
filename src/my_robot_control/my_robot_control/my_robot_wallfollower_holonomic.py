@@ -109,7 +109,7 @@ class WallFollower(Node):
             except Exception:
                 pass
 
-    #-----IMPORTANT EN GIRS PER NO DEPAR---------------------------------------------------------------
+    #-----IMPORTANT EN GIRS PER NO derrapar---------------------------------------------------------------
     def _clamp(self, value, low, high):
         return min(high, max(low, value))
 
@@ -118,7 +118,7 @@ class WallFollower(Node):
         """Periodic publisher: send the latest cmd_vel at 10 Hz."""
         if self._shutting_down:
             return
-
+        
         try:
             self.publisher.publish(self.cmd)
         except Exception:
@@ -138,7 +138,7 @@ class WallFollower(Node):
         # Guardar estat resetejar timer.
 
         if abs(self.front_save_ang) <= 1.0:
-            if self.contador >3:
+            if self.contador >2:
                 self.get_logger().info("Reset timer: FRONT obstacle detected.")
                 self.front_save_ang = 20
                 self.larg_wall = True
