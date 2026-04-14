@@ -26,6 +26,8 @@ There are different methods:
 You need first to install the needed packages (already installed in TheConstruct environment and also in our custom SSD environment):
 ```shell
 sudo apt update
+sudo apt install ros-humble-cartographer 
+sudo apt install ros-humble-cartographer-ros
 sudo apt install ros-humble-navigation2 ros-humble-nav2-bringup
 sudo apt install ros-humble-nav2-simple-commander
 sudo apt install ros-humble-tf-transformations
@@ -159,10 +161,21 @@ To navigate programmatically using Simple Commander API, you have to proceed wit
     ````
 - The params are described in `waypoints_sw.yaml` file in config folder:
     ````yaml
-    nav_waypoints_node:
-        ros__parameters:
-            initial_pose: '(0.5,-1.5,1.57)'
-            waypoints: '[(0.5,-1.0,1.57), (0.0,0.0,3.14)]'
-            final_pose: '(-1.0,1.0,1.57)'
+    initial_pose: [0.5, -1.5, 1.57]
+    waypoints:
+        - [0.5, -1.0, 1.57]
+        - [0.0, 0.0, 3.14]
+    final_pose: [-1.0, 1.0, 1.57]
     ````
     > If waypoints list is empty `waypoints: '[]'` the robot will navigate only from initial_pose to final_pose
+    
+    > wp_file could be send as ROS parameter file (waypoints_sw1.yaml):
+    ````yaml
+    nav_waypoints_node:
+        ros__parameters:
+            initial_pose: [0.0,0.0,0.0]
+            waypoints: # waypoints: [] creates an empty list and goes to final_pose directly
+            - [1.5,0.5,0.3]
+            - [3.4,0.5,-0.5]
+            final_pose: [4.7,0.5,1.57]
+    ````
