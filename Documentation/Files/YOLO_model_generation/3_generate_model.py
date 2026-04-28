@@ -21,7 +21,7 @@ def main():
         lrf=0.01,                      # Final learning rate fraction
         weight_decay=0.0005,           # Regularization to reduce overfitting
 
-        device="cpu",                  # Use CPU. Change to 0 if using GPU
+        device=0,                  # Use CPU. Change to 0 if using GPU
 
         degrees=10.0,                  # Small random rotations: useful for tilted signs
         translate=0.10,                # Small image shifts: useful if the sign is not centered
