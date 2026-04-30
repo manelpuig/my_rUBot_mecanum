@@ -10,7 +10,7 @@ imgsz: 640
 save: true
 save_period: -1
 cache: false
-device: cpu
+device: '0'
 workers: 0
 project: runs/classify
 name: train
@@ -90,11 +90,11 @@ nbs: 64
 hsv_h: 0.015
 hsv_s: 0.4
 hsv_v: 0.3
-degrees: 10.0
+degrees: 5.0
 translate: 0.1
 scale: 0.2
-shear: 3.0
-perspective: 0.0005
+shear: 1.0
+perspective: 0.0
 flipud: 0.0
 fliplr: 0.0
 bgr: 0.0
@@ -107,4 +107,4 @@ auto_augment: randaugment
 erasing: 0.1
 cfg: null
 tracker: botsort.yaml
-save_dir: /home/flavia/Desktop/my_rUBot_mecanum/Documentation/Files/YOLO_model_generation/runs/classify/runs/classify/train
+save_dir: C:\Users\gladi\Documents\my_rUBot_mecanum\Documentation\Files\YOLO_model_generation\runs\classify\runs\classify\train

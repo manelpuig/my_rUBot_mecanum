@@ -6,7 +6,7 @@ import sys
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "models/yolov8n_identification_signals.pt" #"models/yolo11n_classification_signals.pt" #"runs/classify/train/weights/best.pt"
+MODEL_PATH = "runs/classify/train/weights/best.pt" #"models/yolo11n_classification_signals.pt" #"runs/classify/train/weights/best.pt"
 CAMERA_INDEX = 0
 
 # Resolution used during training
@@ -30,7 +30,7 @@ model = YOLO(MODEL_PATH)
 # ==============================
 # OPEN CAMERA
 # ==============================
-cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_MSMF)
 
 # Try to set camera resolution
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, PROCESS_WIDTH)

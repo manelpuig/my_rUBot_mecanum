@@ -23,11 +23,11 @@ def main():
 
         device=0,                  # Use CPU. Change to 0 if using GPU
 
-        degrees=10.0,                  # Small random rotations: useful for tilted signs
+        degrees=5.0,                   # Small random rotations: useful for tilted signs
         translate=0.10,                # Small image shifts: useful if the sign is not centered
         scale=0.20,                    # Small zoom in/out variations
-        shear=3.0,                     # Small geometric distortion
-        perspective=0.0005,            # Very small perspective distortion
+        shear=1.0,                     # Small geometric distortion
+        perspective=0.0,               # Very small perspective distortion
 
         fliplr=0.0,                    # Horizontal flip disabled: Left/Right signs would be confused
         flipud=0.0,                    # Vertical flip disabled: traffic signs are not upside down
