@@ -6,9 +6,9 @@ import os
 # PARAMETERS (EDIT THESE)
 # ==============================
 
-interval_seconds = 0.5      # X → time between photos
+interval_seconds = 0.1      # X → time between photos
 filename_prefix = "image" # Y → base filename
-start_index = 1          # Z → starting number
+start_index = 660          # Z → starting number
 camera_index = 0          # usually 0 for default webcam
 
 # ==============================

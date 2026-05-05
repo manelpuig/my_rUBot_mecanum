@@ -14,7 +14,7 @@ from cv_bridge import CvBridge
 IMAGE_TOPIC = "/image_raw"
 INTERVAL_SECONDS = 0.1
 FILENAME_PREFIX = "image"
-START_INDEX = 1
+START_INDEX = 660
 
 # Relative to the project root directory 
 OUTPUT_RELATIVE_PATH = "photos/Nothing"

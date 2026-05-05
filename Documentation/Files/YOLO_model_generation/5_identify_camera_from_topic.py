@@ -143,7 +143,7 @@ class YoloImageRawNode(Node):
                 )
 
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                font_scale = 0.35
+                font_scale = 0.18
                 thickness = 1
 
                 text_size, _ = cv2.getTextSize(
@@ -197,7 +197,7 @@ class YoloImageRawNode(Node):
             info_text,
             (4, 13),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.35,
+            0.18,
             (255, 255, 255),
             1,
             cv2.LINE_AA
