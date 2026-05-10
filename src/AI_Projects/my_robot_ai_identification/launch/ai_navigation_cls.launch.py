@@ -126,7 +126,7 @@ def generate_launch_description():
         # --------------------------------------------------
         yolo_node = Node(
             package='my_robot_ai_identification',
-            executable='rubot_detection_yolo_exec',
+            executable='rubot_detection_yolo_cls_exec',
             name='object_detection',
             output='screen',
             parameters=[

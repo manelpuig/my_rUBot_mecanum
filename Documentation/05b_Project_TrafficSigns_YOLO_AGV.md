@@ -212,8 +212,10 @@ ros2 launch my_robot_ai_identification ai_navigation.launch.py \
   params_file:=rubot_real_lidar.yaml \
   yolo_params:=yolo_params_real.yaml \
   nav_params:=yolo_targets_real.yaml \
-  signs_file:=sign_positions_real.yaml
+  signs_file:=sign_positions_real.yaml \
+  use_sim_time:=false
 ````
+
 
 | AI Identification and Navigation video | Code execution video |
 |----------|------------|
