@@ -7,7 +7,7 @@ import os
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "models/yolov8n_custom.pt"
+MODEL_PATH = "runs/classify/train/weights/best.pt" #"models/yolov8n_custom.pt"
 
 CAMERA_INDEX = 0
 WINDOW_NAME = "YOLO Traffic Sign Detection"

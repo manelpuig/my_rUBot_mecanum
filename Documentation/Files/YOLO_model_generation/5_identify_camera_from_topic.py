@@ -14,7 +14,7 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 # ==============================
 # GLOBAL PARAMETERS
 # ==============================
-MODEL_PATH = "models/yolov8n_custom.pt"
+MODEL_PATH = "runs/classify/train/weights/best.pt" #"TrainingRoboFlow/Traffic_signals_best.pt" #"models/yolov8n_custom.pt"
 
 IMAGE_TOPIC = "/image_raw"
 

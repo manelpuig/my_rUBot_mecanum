@@ -6,7 +6,7 @@ import sys
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "yolo11n-pose.pt"
+MODEL_PATH = "runs/classify/train/weights/best.pt"#"yolo11n-pose.pt"
 CAMERA_INDEX = 0
 IMG_SIZE = 640
 CONF_THRESHOLD = 0.35
