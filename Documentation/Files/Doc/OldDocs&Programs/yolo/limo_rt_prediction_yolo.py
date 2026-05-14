@@ -15,7 +15,7 @@ class YoloObjectDetection(Node):
         super().__init__('object_detection')
 
         # Load a pre-trained YOLOv8 object detection model
-        self.model = YOLO('/home/agilex/ROS2_rUBot_mecanum_ws/src/AI_Projects/my_robot_ai_identification/models/yolov8n_custom.pt') 
+        self.model = YOLO('/home/flavia/Desktop/my_rUBot_mecanum/src/AI_Projects/my_robot_ai_identification/models/yolov8n_custom.pt') 
         self.yolov8_inference = Yolov8Inference()
 
         self.subscription = self.create_subscription(

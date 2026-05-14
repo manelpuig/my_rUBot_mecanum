@@ -133,7 +133,8 @@ def generate_launch_description():
                 yolo_yaml,
                 {
                     'use_sim_time': use_sim_time,
-                    'signs_file': signs_yaml
+                    'signs_file': signs_yaml,
+                    'front_distance': LaunchConfiguration('front_distance')
                 },
             ],
         )

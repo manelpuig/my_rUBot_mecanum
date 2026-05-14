@@ -24,7 +24,7 @@ class YoloObjectDetection(Node):
 
         # ------------------- Parameters -------------------
         # Aquests valors són defaults; si el YAML els conté, ROS 2 els sobreescriu
-        self.declare_parameter('modelYolo', 'yolov8n_custom.pt')
+        self.declare_parameter('modelYolo', 'best.pt')
         self.declare_parameter('topic', '/image_raw')
         self.declare_parameter('twist_frequency', 20.0)
 

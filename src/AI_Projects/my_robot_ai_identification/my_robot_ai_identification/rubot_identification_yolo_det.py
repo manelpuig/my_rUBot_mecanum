@@ -33,7 +33,7 @@ class YoloObjectDetection(Node):
         # --------------------------------------------------
         # Parameters
         # --------------------------------------------------
-        self.declare_parameter('modelYolo', 'yolov8n_custom.pt')
+        self.declare_parameter('modelYolo', 'best.pt')
         self.declare_parameter('topic', '/image_raw')
         self.declare_parameter('confidence', 0.30)
         self.declare_parameter('front_distance', 1.0)

@@ -36,7 +36,7 @@ class YoloObjectDetection(Node):
         self.declare_parameter('modelYolo', 'best.pt')
         self.declare_parameter('topic', '/image_raw')
         self.declare_parameter('confidence', 0.30)
-        self.declare_parameter('front_distance', 1.5)# modificar en temps d'execució
+        self.declare_parameter('front_distance', 1.0)
         self.declare_parameter('signs_file', '')
 
         model_file = self.get_parameter('modelYolo').value
@@ -58,14 +58,12 @@ class YoloObjectDetection(Node):
         # Reaction constants
         # --------------------------------------------------
         self.hold_times = {
-            'Stop': 3.0,
-            'Forbidden': 5.0,
-            'Give': 2.0,
-            'Left': 2.0,
-            'Right': 2.0
+            'STOP': 3.0,
+            'Prohibido': 5.0,
+            'Ceda': 2.0,
         }
 
-        self.cooldown_repeat_s = 0.0
+        self.cooldown_repeat_s = 5.0
 
         self.wp_forward_m = 0.8
         self.wp_lateral_m = 0.65
@@ -212,9 +210,6 @@ class YoloObjectDetection(Node):
         if distance is None:
             return False
 
-        self.get_logger().info(
-            f"{sign_name} distance={distance:.2f} m self.front_distance={self.front_distance:.2f} m {distance <= self.front_distance}"
-        )
         return distance <= self.front_distance
 
     # --------------------------------------------------
@@ -334,34 +329,34 @@ class YoloObjectDetection(Node):
             return
 
         actions = {
-            'Forbidden': {
+            'Prohibido': {
                 'dx': self.wp_forward_m,
                 'dy': +self.wp_lateral_m,
                 'log': 'bypass waypoint'
             },
-            'Stop': {
+            'STOP': {
                 'dx': self.wp_forward_m,
                 'dy': 0.0,
                 'log': 'stop + forward waypoint'
             },
-            'Give': {
+            'Ceda': {
                 'dx': self.wp_forward_m,
                 'dy': 0.0,
                 'log': 'yield + forward waypoint'
             },
-            'Left': {
+            'Derecha': {
                 'dx': self.wp_forward_m,
                 'dy': -self.wp_lateral_m,
                 'log': 'right waypoint'
             },
-            'Right': {
+            'Izquierda': {
                 'dx': self.wp_forward_m,
                 'dy': +self.wp_lateral_m,
                 'log': 'left waypoint'
             }
         }
-
         for sign_name, action in actions.items():
+
             if sign_name not in detected_signs:
                 continue
 
@@ -369,7 +364,7 @@ class YoloObjectDetection(Node):
                 continue
 
             last_time = self.last_trigger_time.get(sign_name, -1e9)
-            
+
             if now - last_time < self.cooldown_repeat_s:
                 continue
 
@@ -380,18 +375,10 @@ class YoloObjectDetection(Node):
             )
 
             self.last_trigger_time[sign_name] = now
- 
- 
+
             if sign_name in self.hold_times:
                 self.hold_until = now + self.hold_times[sign_name]
-            
-            self.get_logger().info(
-                f"DEBUG: detected={detected_signs} hold_until={self.hold_until:.2f} now={now:.2f}"
-            )
 
-            self.get_logger().info(
-                f"[action] {action['dx']} , {action['dy']} | hold_until={self.hold_until:.2f}"
-            )
             waypoint = self.create_waypoint(
                 sign_name,
                 dx_forward=action['dx'],
@@ -399,9 +386,6 @@ class YoloObjectDetection(Node):
             )
 
             if waypoint is not None:
-                self.get_logger().info(
-                    f"waypoint {waypoint.pose.position.x:.2f}, {waypoint.pose.position.y:.2f}"
-                )
                 self.waypoint_pub.publish(waypoint)
 
             break

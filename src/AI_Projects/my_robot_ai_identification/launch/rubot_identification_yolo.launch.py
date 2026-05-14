@@ -10,7 +10,7 @@ def generate_launch_description():
 
     model_arg = DeclareLaunchArgument(
         'modelYolo',
-        default_value='yolov8n_custom.pt',
+        default_value='best.pt',
         description='YOLO model filename inside models/'
     )
 

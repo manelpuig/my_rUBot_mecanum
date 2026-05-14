@@ -1,0 +1,62 @@
+python3 -m pip install ultralytics
+python3 -m pip uninstall numpy
+python3 -m pip install "numpy<2.0"
+python3 -m pip install pillow
+python3 -m pip install opencv-python
+
+
+python3 1_capture_images_from_topic.py
+python3 2_prepare_dataset.py
+python3 3_generate_model.py
+
+python3 4_classify_camera_from_topic.py
+python3 4_classify_camera_from_topic.py
+
+
+Removing existing folder: traffic_sign_dataset
+Stop: 656 images -> 524 train, 132 val
+Right: 600 images -> 480 train, 120 val
+Left: 613 images -> 490 train, 123 val
+Give: 509 images -> 407 train, 102 val
+Nothing: 660 images -> 528 train, 132 val
+Forbidden: 447 images -> 357 train, 90 val
+
+Dataset prepared successfully.
+Output folder: traffic_sign_dataset
+
+
+ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=real_world_g2_map.yaml params_file:=rubot_real_lidar.yaml
+
+
+
+
+ros2 launch my_robot_ai_identification ai_navigation.launch.py   map_file:=real_world_g2_map.yaml   params_file:=rubot_real_lidar.yaml   yolo_params:=yolo_params_real.yaml   nav_params:=yolo_targets_real.yaml   signs_file:=sign_positions_real.yaml   use_sim_time:=false
+
+
+
+
+ros2 launch my_robot_ai_identification ai_navigation.launch.py   map_file:=real_world_g2_map.yaml   params_file:=rubot_real_lidar.yaml   yolo_params:=yolo_params_real.yaml   nav_params:=yolo_targets_real.yaml   signs_file:=sign_positions_real.yaml   use_sim_time:=false
+
+
+
+
+simulation:
+ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml use_sim_time:=true x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
+ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=true map_file:=map_square4m_sign.yaml params_file:=rubot_real_lidar.yaml
+
+ros2 launch my_robot_ai_identification rubot_identification_yolo.launch.py 
+
+
+
+ros2 topic echo /traffic_waypoint 
+
+
+ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml use_sim_time:=true x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
+
+ros2 launch my_robot_ai_identification ai_navigation.launch.py \
+  map_file:=map_square4m_sign.yaml \
+  params_file:=rubot_real_lidar.yaml \
+  yolo_params:=yolo_params_real.yaml \
+  nav_params:=yolo_targets_real.yaml \
+  signs_file:=sign_positions_real.yaml \
+  use_sim_time:=true

@@ -28,7 +28,7 @@ class YoloObjectDetection(Node):
         self.declare_parameter('confidence', 0.40)
         self.declare_parameter('imgsz', 640)
         self.declare_parameter('max_det', 1)
-        self.declare_parameter('modelYolo', 'yolov8n_custom.pt')
+        self.declare_parameter('modelYolo', 'best.pt')
 
         model_file = self.get_parameter('modelYolo').value
 
