@@ -125,7 +125,7 @@ class YoloObjectDetection(Node):
         # --------------------------------------------------
         # State
         # --------------------------------------------------
-        self.hold_until = 0.0
+        self.hold_until = 4.0
         self.last_trigger_time = {}
 
         # --------------------------------------------------
@@ -384,7 +384,6 @@ class YoloObjectDetection(Node):
  
             if sign_name in self.hold_times:
                 self.hold_until = now + self.hold_times[sign_name]
-            
             self.get_logger().info(
                 f"DEBUG: detected={detected_signs} hold_until={self.hold_until:.2f} now={now:.2f}"
             )
