@@ -284,7 +284,7 @@
     <plugin filename="libignition-gazebo6-odometry-publisher-system.so"
             name="ignition::gazebo::systems::OdometryPublisher">
       <odom_frame>odom</odom_frame>
-      <robot_base_frame>base_link</robot_base_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
       <odom_topic>/odom</odom_topic>
       <tf_topic>/tf</tf_topic>
       <odom_publish_frequency>50</odom_publish_frequency>
