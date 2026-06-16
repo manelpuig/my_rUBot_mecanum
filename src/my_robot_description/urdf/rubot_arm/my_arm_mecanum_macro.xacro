@@ -1,0 +1,310 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <!-- =========================
+        Inertial macros
+        ========================= -->
+
+    <xacro:macro name="inertial_box" params="mass x y z ox oy oz">
+    <inertial>
+        <origin xyz="${ox} ${oy} ${oz}" rpy="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+        ixx="${mass * (y*y + z*z) / 12.0}"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="${mass * (x*x + z*z) / 12.0}"
+        iyz="0.0"
+        izz="${mass * (x*x + y*y) / 12.0}"/>
+    </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="inertial_cylinder_x" params="mass radius length ox oy oz">
+    <inertial>
+        <origin xyz="${ox} ${oy} ${oz}" rpy="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+        ixx="${mass * radius * radius / 2.0}"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="${mass * (3.0*radius*radius + length*length) / 12.0}"
+        iyz="0.0"
+        izz="${mass * (3.0*radius*radius + length*length) / 12.0}"/>
+    </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="inertial_cylinder_z" params="mass radius length ox oy oz">
+    <inertial>
+        <origin xyz="${ox} ${oy} ${oz}" rpy="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+        ixx="${mass * (3.0*radius*radius + length*length) / 12.0}"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="${mass * (3.0*radius*radius + length*length) / 12.0}"
+        iyz="0.0"
+        izz="${mass * radius * radius / 2.0}"/>
+    </inertial>
+    </xacro:macro>
+
+  <xacro:macro name="my_arm_mecanum" params="prefix parent xyz rpy">
+
+    <!-- Mount joint: robot base_link -> arm base -->
+    <joint name="${prefix}arm_mount_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}arm_base_link"/>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+    </joint>
+
+    <link name="${prefix}arm_base_link">
+      <visual>
+        <origin xyz="0 0 0.015" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.08 0.08 0.03"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.015" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.08 0.08 0.03"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_box
+        mass="0.08"
+        x="0.08"
+        y="0.08"
+        z="0.03"
+        ox="0"
+        oy="0"
+        oz="0.015"/>
+    </link>
+
+    <!-- joint1: base yaw -->
+    <joint name="${prefix}joint1" type="revolute">
+      <parent link="${prefix}arm_base_link"/>
+      <child link="${prefix}link1"/>
+      <origin xyz="0 0 0.03" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.5708" upper="1.5708" effort="1.0" velocity="1.0"/>
+    </joint>
+
+    <link name="${prefix}link1">
+      <visual>
+        <origin xyz="0 0 0.0275" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.012" length="0.055"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0.0275" rpy="0 0 0"/>
+        <geometry>
+            <cylinder radius="0.012" length="0.055"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_cylinder_z
+        mass="0.03"
+        radius="0.012"
+        length="0.055"
+        ox="0"
+        oy="0"
+        oz="0.0275"/>
+    </link>
+
+    <!-- joint2: shoulder pitch -->
+    <joint name="${prefix}joint2" type="revolute">
+      <parent link="${prefix}link1"/>
+      <child link="${prefix}link2"/>
+      <origin xyz="0 0 0.055" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.5708" upper="1.5708" effort="1.0" velocity="1.0"/>
+    </joint>
+
+    <link name="${prefix}link2">
+      <visual>
+        <origin xyz="0.0375 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+          <cylinder radius="0.012" length="0.075"/>
+        </geometry>
+        <material name="yellow"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0375 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+            <cylinder radius="0.012" length="0.075"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_cylinder_x
+        mass="0.025"
+        radius="0.012"
+        length="0.075"
+        ox="0.0375"
+        oy="0"
+        oz="0"/>
+    </link>
+
+    <!-- joint3: elbow pitch -->
+    <joint name="${prefix}joint3" type="revolute">
+      <parent link="${prefix}link2"/>
+      <child link="${prefix}link3"/>
+      <origin xyz="0.075 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.5708" upper="1.5708" effort="1.0" velocity="1.0"/>
+    </joint>
+
+    <link name="${prefix}link3">
+      <visual>
+        <origin xyz="0.0375 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+          <cylinder radius="0.012" length="0.075"/>
+        </geometry>
+        <material name="yellow"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0375 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+            <cylinder radius="0.012" length="0.075"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_cylinder_x
+        mass="0.025"
+        radius="0.012"
+        length="0.075"
+        ox="0.0375"
+        oy="0"
+        oz="0"/>
+    </link>
+
+    <!-- joint4: wrist pitch -->
+    <joint name="${prefix}joint4" type="revolute">
+      <parent link="${prefix}link3"/>
+      <child link="${prefix}link4"/>
+      <origin xyz="0.075 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.5708" upper="1.5708" effort="1.0" velocity="1.0"/>
+    </joint>
+
+    <link name="${prefix}link4">
+      <visual>
+        <origin xyz="0.0225 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+          <cylinder radius="0.010" length="0.045"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0225 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+            <cylinder radius="0.010" length="0.045"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_cylinder_x
+        mass="0.015"
+        radius="0.010"
+        length="0.045"
+        ox="0.0225"
+        oy="0"
+        oz="0"/>
+    </link>
+
+    <!-- joint5: wrist roll -->
+    <joint name="${prefix}joint5" type="revolute">
+      <parent link="${prefix}link4"/>
+      <child link="${prefix}link5"/>
+      <origin xyz="0.045 0 0" rpy="0 0 0"/>
+      <axis xyz="1 0 0"/>
+      <limit lower="-1.5708" upper="1.5708" effort="1.0" velocity="1.0"/>
+    </joint>
+
+    <link name="${prefix}link5">
+      <visual>
+        <origin xyz="0.015 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.030 0.030 0.025"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0.015 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.030 0.030 0.025"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_box
+        mass="0.02"
+        x="0.030"
+        y="0.030"
+        z="0.025"
+        ox="0.015"
+        oy="0"
+        oz="0"/>
+    </link>
+
+    <!-- joint6: left gripper finger open/close -->
+    <joint name="${prefix}joint6" type="prismatic">
+        <parent link="${prefix}link5"/>
+        <child link="${prefix}link6"/>
+        <origin xyz="0.030 0.010 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0.0" upper="0.015" effort="1.0" velocity="0.05"/>
+    </joint>
+
+    <link name="${prefix}link6">
+    <visual>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <geometry>
+        <box size="0.050 0.008 0.012"/>
+        </geometry>
+        <material name="green"/>
+    </visual>
+    <collision>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <geometry>
+        <box size="0.050 0.008 0.012"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_box
+        mass="0.005"
+        x="0.050"
+        y="0.008"
+        z="0.012"
+        ox="0.025"
+        oy="0"
+        oz="0"/>
+    </link>
+
+    <!-- right gripper finger, fixed -->
+    <joint name="${prefix}joint6_right" type="fixed">
+        <parent link="${prefix}link5"/>
+        <child link="${prefix}link6_right"/>
+        <origin xyz="0.030 -0.010 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${prefix}link6_right">
+    <visual>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <geometry>
+        <box size="0.050 0.008 0.012"/>
+        </geometry>
+        <material name="green"/>
+    </visual>
+    <collision>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <geometry>
+        <box size="0.050 0.008 0.012"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_box
+        mass="0.005"
+        x="0.050"
+        y="0.008"
+        z="0.012"
+        ox="0.025"
+        oy="0"
+        oz="0"/>
+    </link>
+
+  </xacro:macro>
+
+</robot>

@@ -1,21 +1,32 @@
 import os
+
 from ament_index_python.packages import get_package_share_directory
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
 from launch.actions import SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, EnvironmentVariable
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    EnvironmentVariable,
+    Command,
+)
+
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
 
     pkg_bringup = get_package_share_directory("my_robot_bringup")
     pkg_description = get_package_share_directory("my_robot_description")
+    install_share_path = os.path.dirname(pkg_description)
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
 
     # Launch arguments
     world = LaunchConfiguration("world")
+    robot_model = LaunchConfiguration("robot_model")
     robot_name = LaunchConfiguration("robot_name")
     x = LaunchConfiguration("x")
     y = LaunchConfiguration("y")
@@ -32,38 +43,30 @@ def generate_launch_description():
         world,
     ])
 
-    robot_sdf_path = PathJoinSubstitution([
-        pkg_bringup,
-        "models",
-        "rubot_mecanum",
-        "model.sdf",
-    ])
-
-    urdf_path = os.path.join(
+    urdf_path = PathJoinSubstitution([
         pkg_description,
         "urdf",
-        "rubot",
-        "rubot_mecanum_gz.urdf",
+        robot_model,
+    ])
+
+    robot_description = ParameterValue(
+        Command(["xacro ", urdf_path]),
+        value_type=str
     )
 
-    with open(urdf_path, "r") as f:
-        robot_description = f.read()
-
-    # Robot State Publisher: publishes TF from URDF
+    # Robot State Publisher
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="screen",
-        parameters=[
-            {
-                "use_sim_time": True,
-                "robot_description": robot_description,
-            }
-        ],
+        parameters=[{
+            "use_sim_time": True,
+            "robot_description": robot_description,
+        }],
     )
- 
-    # Start Gazebo Ignition / Gazebo Fortress
+
+    # Gazebo Ignition / Fortress
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, "launch", "gz_sim.launch.py")
@@ -73,14 +76,14 @@ def generate_launch_description():
         }.items(),
     )
 
-    # Spawn robot from SDF model
+    # Spawn robot from robot_description topic
     spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
         output="screen",
         arguments=[
             "-name", robot_name,
-            "-file", robot_sdf_path,
+            "-topic", "robot_description",
             "-x", x,
             "-y", y,
             "-z", z,
@@ -88,7 +91,7 @@ def generate_launch_description():
         ],
     )
 
-    # Minimal ROS <-> Gazebo bridge
+    # ROS <-> Gazebo bridge
     bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
@@ -99,19 +102,16 @@ def generate_launch_description():
             "/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist",
             "/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
             "/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan",
-            "/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
+            #"/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
 
             "/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image",
             "/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo",
             "/camera/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image",
             "/camera/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked",
         ],
-        parameters=[
-            {"use_sim_time": True}
-        ],
+        parameters=[{"use_sim_time": True}],
     )
 
-    # Different frame name lidar in gz
     static_lidar_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
@@ -131,7 +131,6 @@ def generate_launch_description():
         parameters=[{"use_sim_time": True}],
     )
 
-    # Different frame name camera in gz
     static_camera_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
@@ -167,6 +166,11 @@ def generate_launch_description():
             default_value="empty_world_ign.world",
             description="World file inside my_robot_bringup/worlds",
         ),
+        DeclareLaunchArgument(
+            "robot_model",
+            default_value="rubot_arm/rubot_mecanum_arm.urdf.xacro",
+            description="Robot model path relative to my_robot_description/urdf",
+        ),
         DeclareLaunchArgument("robot_name", default_value="rubot_mecanum"),
         DeclareLaunchArgument("x", default_value="0.0"),
         DeclareLaunchArgument("y", default_value="0.0"),
@@ -180,9 +184,14 @@ def generate_launch_description():
                 ":",
                 worlds_path,
                 ":",
+                pkg_description,
+                ":",
+                install_share_path,
+                ":",
                 EnvironmentVariable("IGN_GAZEBO_RESOURCE_PATH", default_value=""),
             ],
         ),
+
         SetEnvironmentVariable(
             name="GZ_SIM_RESOURCE_PATH",
             value=[
@@ -190,9 +199,14 @@ def generate_launch_description():
                 ":",
                 worlds_path,
                 ":",
+                pkg_description,
+                ":",
+                install_share_path,
+                ":",
                 EnvironmentVariable("GZ_SIM_RESOURCE_PATH", default_value=""),
             ],
         ),
+
         robot_state_publisher,
         gazebo,
         delayed_spawn_and_bridge,

@@ -1,192 +1,199 @@
 import os
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, TimerAction, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.actions import SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import (
-    LaunchConfiguration, PythonExpression, TextSubstitution,
-    PathJoinSubstitution
-)
-from launch_ros.actions import Node, SetParameter
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, EnvironmentVariable
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    pkg_bringup = get_package_share_directory("my_robot_bringup")
-    pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
-    pkg_desc = get_package_share_directory("my_robot_description")
 
-    # Args
+    pkg_bringup = get_package_share_directory("my_robot_bringup")
+    pkg_description = get_package_share_directory("my_robot_description")
+    pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
+
+    # Launch arguments
     world = LaunchConfiguration("world")
-    robot_name = LaunchConfiguration("robot")
+    robot_name = LaunchConfiguration("robot_name")
     x = LaunchConfiguration("x")
     y = LaunchConfiguration("y")
-    w = LaunchConfiguration("w")
+    z = LaunchConfiguration("z")
+    yaw = LaunchConfiguration("yaw")
 
-    default_world = "sign_world_ign.world"
-    default_robot = "rubot_mecanum"
+    # Paths
+    models_path = os.path.join(pkg_bringup, "models")
+    worlds_path = os.path.join(pkg_bringup, "worlds")
 
-    world_path = PathJoinSubstitution([TextSubstitution(text=pkg_bringup), "worlds", world])
-    robot_sdf_path = PathJoinSubstitution([TextSubstitution(text=pkg_bringup), "models", robot_name, "model.sdf"])
-    yaw_rad = PythonExpression([w, " * 3.141592653589793 / 180.0"])
+    world_path = PathJoinSubstitution([
+        pkg_bringup,
+        "worlds",
+        world,
+    ])
 
-    bridge_yaml = os.path.join(pkg_bringup, "config", "ros_gz_bridge_camera.yaml")
+    robot_sdf_path = PathJoinSubstitution([
+        pkg_bringup,
+        "models",
+        "rubot_mecanum",
+        "model.sdf",
+    ])
 
-    # URDF for TF / RobotModel in RViz
-    urdf_file = os.path.join(pkg_desc, "urdf", "rubot", "rubot_mecanum_gz.urdf")
-    with open(urdf_file, "r") as f:
-        robot_description_xml = f.read()
+    urdf_path = os.path.join(
+        pkg_description,
+        "urdf",
+        "rubot",
+        "rubot_mecanum_gz.urdf",
+    )
 
+    with open(urdf_path, "r") as f:
+        robot_description = f.read()
+
+    # Robot State Publisher: publishes TF from URDF
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
+        name="robot_state_publisher",
         output="screen",
-        parameters=[{
-            "use_sim_time": True,
-            "robot_description": robot_description_xml,
-        }],
-    )
-
-    # image_transport republishers (leave as-is)
-    rgb_compressed = Node(
-        package="image_transport",
-        executable="republish",
-        name="rgb_republisher",
-        output="screen",
-        arguments=["raw", "compressed"],
-        remappings=[
-            ("/in", "/camera/image"),
-            ("/out/compressed", "/camera/image/compressed"),
+        parameters=[
+            {
+                "use_sim_time": True,
+                "robot_description": robot_description,
+            }
         ],
-        parameters=[{"use_sim_time": True}],
+    )
+ 
+    # Start Gazebo Ignition / Gazebo Fortress
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ros_gz_sim, "launch", "gz_sim.launch.py")
+        ),
+        launch_arguments={
+            "gz_args": ["-r ", world_path],
+        }.items(),
     )
 
-    depth_compressed = Node(
-        package="image_transport",
-        executable="republish",
-        name="depth_republisher",
-        output="screen",
-        arguments=["raw", "compressedDepth"],
-        remappings=[
-            ("/in", "/camera/depth_image"),
-            ("/out/compressedDepth", "/camera/depth_image/compressedDepth"),
-        ],
-        parameters=[{"use_sim_time": True}],
-    )
-
-    # Gazebo Sim
-    gz_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(pkg_ros_gz_sim, "launch", "gz_sim.launch.py")),
-        launch_arguments={"gz_args": ["-r ", world_path]}.items(),
-    )
-
-    # Spawn robot
-    spawn = Node(
+    # Spawn robot from SDF model
+    spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
         output="screen",
         arguments=[
             "-name", robot_name,
             "-file", robot_sdf_path,
-            "-x", x, "-y", y,
-            "-z", "0.05",
-            "-Y", yaw_rad,
+            "-x", x,
+            "-y", y,
+            "-z", z,
+            "-Y", yaw,
         ],
     )
 
-    # Bridge
+    # Minimal ROS <-> Gazebo bridge
     bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
         name="ros_gz_bridge",
         output="screen",
         arguments=[
-            "--ros-args",
-            "-p", f"config_file:={bridge_yaml}",
+            "/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock",
+            "/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist",
+            "/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
+            "/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan",
+            "/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
+
+            "/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image",
+            "/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo",
+            "/camera/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image",
+            "/camera/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked",
+        ],
+        parameters=[
+            {"use_sim_time": True}
         ],
     )
 
-    # Clock
-    clock_relay = Node(
-        package='topic_tools',
-        executable='relay',
-        name='clock_relay',
-        output='screen',
-        arguments=['/world/empty_world_ign/clock', '/clock'],
-    )
-
-    # Localization TF odom
-    ekf_yaml = os.path.join(pkg_bringup, "config", "ekf_odom.yaml")
-    ekf = Node(
-        package="robot_localization",
-        executable="ekf_node",
-        name="ekf_filter_node",
-        output="screen",
-        parameters=[ekf_yaml],
-    )
-
-    # Link frame_id base_scan from ROS2 to frame_id from Gazebo Sim: <robot>/base_scan/lidar
-    lidar_sensor_frame = PythonExpression(["'", robot_name, "/base_scan/lidar'"])
+    # Different frame name lidar in gz
     static_lidar_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
+        name="static_lidar_tf",
         output="screen",
-        # x y z qx qy qz qw parent child
         arguments=[
-            "--x", "0", "--y", "0", "--z", "0",
-            "--qx", "0", "--qy", "0", "--qz", "0", "--qw", "1",
+            "--x", "0",
+            "--y", "0",
+            "--z", "0",
+            "--qx", "0",
+            "--qy", "0",
+            "--qz", "0",
+            "--qw", "1",
             "--frame-id", "base_scan",
-            "--child-frame-id", lidar_sensor_frame,
+            "--child-frame-id", "rubot_mecanum/base_scan/lidar",
         ],
         parameters=[{"use_sim_time": True}],
     )
-    # Link frame_id camera from ROS2 to frame_id from Gazebo Sim: <robot>/camera/rgbd_camera
-    camera_sensor_frame = PythonExpression(["'", robot_name, "/camera/rgbd_camera'"])
+
+    # Different frame name camera in gz
     static_camera_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
+        name="static_camera_tf",
         output="screen",
-        # x y z qx qy qz qw parent child
         arguments=[
-            "--x", "0", "--y", "0", "--z", "0",
-            "--qx", "0", "--qy", "0", "--qz", "0", "--qw", "1",
+            "--x", "0",
+            "--y", "0",
+            "--z", "0",
+            "--qx", "0",
+            "--qy", "0",
+            "--qz", "0",
+            "--qw", "1",
             "--frame-id", "camera",
-            "--child-frame-id", camera_sensor_frame,
-        ],
-        parameters=[{"use_sim_time": True}],
-    )
-    # Link base_footprint --> base_link
-    static_basefootprint_tf = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        output="screen",
-        arguments=[
-            "--x", "0", "--y", "0", "--z", "0",
-            "--qx", "0", "--qy", "0", "--qz", "0", "--qw", "1",
-            "--frame-id", "base_footprint",
-            "--child-frame-id", "base_link",
+            "--child-frame-id", "rubot_mecanum/camera/rgbd_camera",
         ],
         parameters=[{"use_sim_time": True}],
     )
 
-    delayed_gz = TimerAction(
-        period=5.0,
-        actions=[spawn, bridge, clock_relay, ekf, static_basefootprint_tf, static_lidar_tf, static_camera_tf],
+    delayed_spawn_and_bridge = TimerAction(
+        period=3.0,
+        actions=[
+            spawn_robot,
+            bridge,
+            static_lidar_tf,
+            static_camera_tf,
+        ],
     )
 
     return LaunchDescription([
-        SetParameter(name="use_sim_time", value=True),
-
-        DeclareLaunchArgument("world", default_value=default_world),
-        DeclareLaunchArgument("robot", default_value=default_robot),
+        DeclareLaunchArgument(
+            "world",
+            default_value="empty_world_ign.world",
+            description="World file inside my_robot_bringup/worlds",
+        ),
+        DeclareLaunchArgument("robot_name", default_value="rubot_mecanum"),
         DeclareLaunchArgument("x", default_value="0.0"),
         DeclareLaunchArgument("y", default_value="0.0"),
-        DeclareLaunchArgument("w", default_value="0.0"),
+        DeclareLaunchArgument("z", default_value="0.05"),
+        DeclareLaunchArgument("yaw", default_value="0.0"),
 
+        SetEnvironmentVariable(
+            name="IGN_GAZEBO_RESOURCE_PATH",
+            value=[
+                models_path,
+                ":",
+                worlds_path,
+                ":",
+                EnvironmentVariable("IGN_GAZEBO_RESOURCE_PATH", default_value=""),
+            ],
+        ),
+        SetEnvironmentVariable(
+            name="GZ_SIM_RESOURCE_PATH",
+            value=[
+                models_path,
+                ":",
+                worlds_path,
+                ":",
+                EnvironmentVariable("GZ_SIM_RESOURCE_PATH", default_value=""),
+            ],
+        ),
         robot_state_publisher,
-        rgb_compressed,
-        depth_compressed,
-
-        gz_launch,
-        delayed_gz,
+        gazebo,
+        delayed_spawn_and_bridge,
     ])

@@ -366,7 +366,7 @@ ros2 launch my_robot_description display.launch.xml
 
 If you want to see other robot models, use speciffic `robot_model` argument, type in a new terminal:
 ```shell
-ros2 launch my_robot_description display.launch.xml robot_model:=limo/rubot_limo.urdf
+ros2 launch my_robot_description display.launch.py robot_model:=rubot_arm/rubot_mecanum_arm.urdf.xacro
 ```
 > Colors in rviz: 
 >- are defined at the beginning
