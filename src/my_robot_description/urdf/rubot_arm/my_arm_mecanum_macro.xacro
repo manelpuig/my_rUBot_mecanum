@@ -305,6 +305,30 @@
         oz="0"/>
     </link>
 
+    <gazebo reference="${prefix}arm_base_link">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link1">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link2">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link3">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link4">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link5">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link6">
+    <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link6_right">
+    <gravity>false</gravity>
+    </gazebo>
   </xacro:macro>
 
 </robot>

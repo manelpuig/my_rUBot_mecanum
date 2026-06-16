@@ -66,6 +66,17 @@ def generate_launch_description():
         }],
     )
 
+    # Joint state publisher
+    joint_state_publisher = Node(
+        package="joint_state_publisher",
+        executable="joint_state_publisher",
+        name="joint_state_publisher",
+        output="screen",
+        parameters=[{
+            "use_sim_time": True,
+        }],
+    )
+
     # Gazebo Ignition / Fortress
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -73,7 +84,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "gz_args": ["-r ", world_path],
-        }.items(),
+        }.items()
     )
 
     # Spawn robot from robot_description topic
@@ -126,7 +137,7 @@ def generate_launch_description():
             "--qz", "0",
             "--qw", "1",
             "--frame-id", "base_scan",
-            "--child-frame-id", "rubot_mecanum/base_scan/lidar",
+            "--child-frame-id", "rubot_mecanum/base_link/lidar",
         ],
         parameters=[{"use_sim_time": True}],
     )
@@ -174,7 +185,7 @@ def generate_launch_description():
         DeclareLaunchArgument("robot_name", default_value="rubot_mecanum"),
         DeclareLaunchArgument("x", default_value="0.0"),
         DeclareLaunchArgument("y", default_value="0.0"),
-        DeclareLaunchArgument("z", default_value="0.05"),
+        DeclareLaunchArgument("z", default_value="0.08"),
         DeclareLaunchArgument("yaw", default_value="0.0"),
 
         SetEnvironmentVariable(
@@ -208,6 +219,7 @@ def generate_launch_description():
         ),
 
         robot_state_publisher,
+        joint_state_publisher,
         gazebo,
         delayed_spawn_and_bridge,
     ])
