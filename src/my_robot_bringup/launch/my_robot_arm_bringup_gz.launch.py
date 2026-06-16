@@ -66,7 +66,7 @@ def generate_launch_description():
         }],
     )
 
-    # Joint state publisher
+    """# Joint state publisher
     joint_state_publisher = Node(
         package="joint_state_publisher",
         executable="joint_state_publisher",
@@ -75,7 +75,7 @@ def generate_launch_description():
         parameters=[{
             "use_sim_time": True,
         }],
-    )
+    )"""
 
     # Gazebo Ignition / Fortress
     gazebo = IncludeLaunchDescription(
@@ -161,6 +161,28 @@ def generate_launch_description():
         parameters=[{"use_sim_time": True}],
     )
 
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        output="screen",
+    )
+
+    arm_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "arm_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        output="screen",
+    )
+
     delayed_spawn_and_bridge = TimerAction(
         period=3.0,
         actions=[
@@ -168,6 +190,14 @@ def generate_launch_description():
             bridge,
             static_lidar_tf,
             static_camera_tf,
+        ],
+    )
+
+    delayed_controllers = TimerAction(
+        period=6.0,
+        actions=[
+            joint_state_broadcaster_spawner,
+            arm_controller_spawner,
         ],
     )
 
@@ -219,7 +249,8 @@ def generate_launch_description():
         ),
 
         robot_state_publisher,
-        joint_state_publisher,
+        #joint_state_publisher,
         gazebo,
         delayed_spawn_and_bridge,
+        delayed_controllers,
     ])

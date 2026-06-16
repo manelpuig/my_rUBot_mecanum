@@ -558,3 +558,31 @@ Launch the teleop-twist-keyboard control node:
 ```shell
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
+
+## Bringup my robot arm
+
+- Bringup the robot:
+````bash
+ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py  robot_model:=rubot_arm/rubot_mecanum_arm.urdf.xacro
+````
+- control Joints:
+````bash
+ros2 topic pub /arm_controller/joint_trajectory trajectory_msgs/msg/JointTrajectory "
+joint_names:
+- arm_joint1
+- arm_joint2
+- arm_joint3
+- arm_joint4
+- arm_joint5
+- arm_joint6
+points:
+- positions: [0.0, 0.3, -0.3, 0.0, 0.0, 0.000]
+  time_from_start: {sec: 1, nanosec: 0}
+- positions: [0.5, 0.5, -0.6, 0.2, 0.0, 0.005]
+  time_from_start: {sec: 3, nanosec: 0}
+- positions: [0.0, 0.0, 0.0, 0.0, 0.0, 0.000]
+  time_from_start: {sec: 5, nanosec: 0}
+" --once
+````
+
+![](./Images/02_rubot_model/Bringup_rubot_arm.png)

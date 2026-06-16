@@ -298,4 +298,56 @@
             <visualize>true</visualize>
         </sensor>
     </gazebo>
+    <!-- =========================
+     ros2_control for SG90 arm in Gazebo
+     ========================= -->
+
+    <ros2_control name="ArmGazeboSystem" type="system">
+    <hardware>
+        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+    </hardware>
+
+    <joint name="arm_joint1">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="arm_joint2">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="arm_joint3">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="arm_joint4">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="arm_joint5">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="arm_joint6">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+    </joint>
+    </ros2_control>
+
+    <gazebo>
+    <plugin name="ign_ros2_control::IgnitionROS2ControlPlugin"
+            filename="libign_ros2_control-system.so">
+        <parameters>$(find my_robot_bringup)/config/arm_controllers.yaml</parameters>
+    </plugin>
+    </gazebo>
 </robot>
