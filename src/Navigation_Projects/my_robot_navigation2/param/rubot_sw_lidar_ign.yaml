@@ -110,7 +110,7 @@ velocity_smoother:
     feedback: "OPEN_LOOP"
 
     max_velocity: [0.4, 0.15, 2.5]
-    min_velocity: [-0.05, -0.15, -2.5]
+    min_velocity: [-0.2, -0.15, -2.5]
 
     max_accel: [1.5, 1.0, 8.0]
     max_decel: [-1.5, -1.0, -8.0]
@@ -144,18 +144,18 @@ controller_server:
     general_goal_checker:
       stateful: false
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.30   # Augmenta la tolerància de posició XY (abans 0.25)
-      yaw_goal_tolerance: 0.5 # Augmenta la tolerància d'orientació (aproximadament 45 graus, abans 0.25 radians)
+      xy_goal_tolerance: 0.35   # Augmenta la tolerància de posició XY (abans 0.25)
+      yaw_goal_tolerance: 0.4 # Augmenta la tolerància d'orientació (aproximadament 45 graus, abans 0.25 radians)
 
     # DWB parameters
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: False
 
-      min_vel_x: 0.0
+      min_vel_x: -0.2
       max_vel_x: 0.4
-      min_vel_y: -0.12
-      max_vel_y: 0.12
+      min_vel_y: -0.15
+      max_vel_y: 0.15
       min_vel_theta: -2.5
       max_vel_theta: 2.5
 
@@ -194,15 +194,15 @@ controller_server:
       - PathDist
       - GoalDist
 
-      BaseObstacle.scale: 8.0
-      PathAlign.scale: 10.0
+      BaseObstacle.scale: 6.0
+      PathAlign.scale: 4.0
       PathAlign.forward_point_distance: 0.7
-      GoalAlign.scale: 3.0
+      GoalAlign.scale: 2.0
       GoalAlign.forward_point_distance: 0.5
-      PathDist.scale: 6.0
+      PathDist.scale: 3.0
       GoalDist.scale: 8.0
       RotateToGoal.scale: 15.0
-      RotateToGoal.slowing_factor: 0.01
+      RotateToGoal.slowing_factor: 0.001
       RotateToGoal.lookahead_time: -1.0
 
 controller_server_rclcpp_node:
@@ -243,7 +243,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.22
+        inflation_radius: 0.20
         cost_scaling_factor: 2.5
 
       always_send_full_costmap: True
@@ -308,15 +308,17 @@ behavior_server:
     costmap_topic: local_costmap/costmap_raw
     footprint_topic: local_costmap/published_footprint
     cycle_frequency: 10.0
-    behavior_plugins: ["backup", "wait"]
+    behavior_plugins: ["spin","backup", "wait"]
     global_frame: odom
     robot_base_frame: base_footprint
     transform_tolerance: 0.7
     simulate_ahead_time: 1.0
-    max_rotational_vel: 0.6
+    max_rotational_vel: 0.5
     min_rotational_vel: 0.05
-    rotational_acc_lim: 1.5
+    rotational_acc_lim: 1.0
 
+    spin:
+      plugin: "nav2_behaviors/Spin"
     backup:
       plugin: "nav2_behaviors/BackUp"
     wait:
