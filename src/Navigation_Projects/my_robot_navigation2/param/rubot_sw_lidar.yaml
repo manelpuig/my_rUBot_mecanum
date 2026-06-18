@@ -149,52 +149,52 @@ controller_server:
       plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: False
 
-      min_vel_x: 0.0
-      max_vel_x: 0.30
-      min_vel_y: -0.12
-      max_vel_y: 0.12
-      min_vel_theta: -0.8
-      max_vel_theta: 0.8
+      min_vel_x: -0.02
+      min_vel_y: -0.05
+      min_vel_theta: -0.45
+      max_vel_x: 0.15
+      max_vel_y: 0.05
+      max_vel_theta: 0.45
 
-      trans_stopped_velocity: 0.02
-      rot_stopped_velocity: 0.05
+      trans_stopped_velocity: 0.04
+      min_speed_xy: 0.06
+      max_speed_xy: 0.17
 
-      min_speed_xy: 0.02
-      max_speed_xy: 0.30
-      min_speed_theta: 0.05
+      acc_lim_x: 0.8
+      acc_lim_y: 0.4
+      acc_lim_theta: 0.9
 
-      acc_lim_x: 1.0
-      acc_lim_y: 0.8
-      acc_lim_theta: 1.5
-      decel_lim_x: -1.0
-      decel_lim_y: -0.8
-      decel_lim_theta: -1.5
+      decel_lim_x: -0.8
+      decel_lim_y: -0.4
+      decel_lim_theta: -0.9
 
-      vx_samples: 20
-      vy_samples: 7
-      vtheta_samples: 30
+      vx_samples: 15
+      vy_samples: 3
+      vtheta_samples: 21
 
-      sim_time: 1.5
+      sim_time: 1.0
       linear_granularity: 0.05
       angular_granularity: 0.025
       transform_tolerance: 0.3
 
-      short_circuit_trajectory_evaluation: true
-      stateful: true
+      xy_goal_tolerance: 0.12
 
-      critics:
-      - RotateToGoal
-      - Oscillation
-      - BaseObstacle
-      - GoalAlign
-      - PathAlign
-      - PathDist
-      - GoalDist
+      short_circuit_trajectory_evaluation: True
+      stateful: True
+
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
 
       BaseObstacle.scale: 0.8
+
       PathAlign.scale: 12.0
-      PathAlign.forward_point_distance: 0.4
+      PathAlign.forward_point_distance: 0.40
+
+      #GoalAlign.scale: 18.0
+      #GoalAlign.forward_point_distance: 0.40
+
       PathDist.scale: 8.0
+      #GoalDist.scale: 16.0
+
       RotateToGoal.scale: 6.0
       RotateToGoal.slowing_factor: 2.0
       RotateToGoal.lookahead_time: -1.0
@@ -215,7 +215,7 @@ local_costmap:
       width: 2
       height: 2
       resolution: 0.05
-      robot_radius: 0.15
+      robot_radius: 0.20
       transform_tolerance: 0.3
       plugins: ["obstacle_layer", "inflation_layer"]
 
@@ -250,7 +250,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_footprint
       use_sim_time: True
-      robot_radius: 0.15
+      robot_radius: 0.20
       resolution: 0.05
       track_unknown_space: true
       transform_tolerance: 0.3

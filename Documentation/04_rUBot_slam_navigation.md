@@ -103,7 +103,7 @@ These 3 packages are organized inside a `Navigation_Projects` subfolder on src f
         - Launch Navigation node: python launcher is more powerfull than previous xml format
         ````bash
         ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=map_square4m_sign.yaml params_file:=rubot_sw.yaml 
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=my_map3.yaml params_file:=rubot_sw_lidar_ign.yaml
+        ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=map_square_sign_ign.yaml params_file:=rubot_sw_lidar_ign.yaml
         ````
         >An optimized set of Navigation parameters is set on rubot_sw_lidar.yaml:
         >    - Initial Pose is set
