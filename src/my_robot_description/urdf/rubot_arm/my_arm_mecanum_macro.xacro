@@ -305,30 +305,75 @@
         oz="0"/>
     </link>
 
-    <gazebo reference="${prefix}arm_base_link">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link1">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link2">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link3">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link4">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link5">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link6">
-    <gravity>false</gravity>
-    </gazebo>
-    <gazebo reference="${prefix}link6_right">
-    <gravity>false</gravity>
-    </gazebo>
+    <link name="${prefix}tool">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+        <sphere radius="0.008"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+        <sphere radius="0.008"/>
+        </geometry>
+    </collision>
+    </link>
+
+    <joint name="${prefix}link5_to_tool" type="fixed">
+        <parent link="${prefix}link5"/>
+        <child link="${prefix}tool"/>
+        <origin xyz="0.050 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <ros2_control name="${prefix}RubotMecanumArmSystem" type="system">
+        <hardware>
+            <plugin>$(arg hardware_plugin)</plugin>
+        </hardware>
+
+        <joint name="${prefix}joint1">
+            <param name="position_proportional_gain">5.0</param>
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="${prefix}joint2">
+            <param name="position_proportional_gain">5.0</param>
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="${prefix}joint3">
+            <param name="position_proportional_gain">5.0</param>
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="${prefix}joint4">
+            <param name="position_proportional_gain">5.0</param>
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="${prefix}joint5">
+            <param name="position_proportional_gain">5.0</param>
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="${prefix}joint6">
+            <param name="position_proportional_gain">5.0</param>
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
+
   </xacro:macro>
 
 </robot>

@@ -15,6 +15,7 @@ from launch.substitutions import (
 
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
+from launch.actions import ExecuteProcess
 
 
 def generate_launch_description():
@@ -36,6 +37,11 @@ def generate_launch_description():
     # Paths
     models_path = os.path.join(pkg_bringup, "models")
     worlds_path = os.path.join(pkg_bringup, "worlds")
+    controllers_file = os.path.join(
+        pkg_bringup,
+        "config",
+        "arm_controllers.yaml"
+    )
 
     world_path = PathJoinSubstitution([
         pkg_bringup,
@@ -50,7 +56,13 @@ def generate_launch_description():
     ])
 
     robot_description = ParameterValue(
-        Command(["xacro ", urdf_path]),
+        Command([
+            "xacro ",
+            urdf_path,
+            " use_gazebo_plugin:=true",
+            " hardware_plugin:=ign_ros2_control/IgnitionSystem",
+            " ros2_control_params:=", controllers_file,
+        ]),
         value_type=str
     )
 
@@ -65,17 +77,6 @@ def generate_launch_description():
             "robot_description": robot_description,
         }],
     )
-
-    """# Joint state publisher
-    joint_state_publisher = Node(
-        package="joint_state_publisher",
-        executable="joint_state_publisher",
-        name="joint_state_publisher",
-        output="screen",
-        parameters=[{
-            "use_sim_time": True,
-        }],
-    )"""
 
     # Gazebo Ignition / Fortress
     gazebo = IncludeLaunchDescription(
@@ -116,9 +117,9 @@ def generate_launch_description():
             #"/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
 
             "/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image",
-            "/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo",
-            "/camera/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image",
-            "/camera/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked",
+            #"/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo",
+            #"/camera/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image",
+            #"/camera/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked",
         ],
         parameters=[{"use_sim_time": True}],
     )
@@ -183,6 +184,19 @@ def generate_launch_description():
         output="screen",
     )
 
+    initial_arm_pose = ExecuteProcess(
+        cmd=[
+            "ros2 topic pub --once "
+            "/arm_controller/joint_trajectory "
+            "trajectory_msgs/msg/JointTrajectory "
+            "\"{joint_names: [arm_joint1, arm_joint2, arm_joint3, arm_joint4, arm_joint5, arm_joint6], "
+            "points: [{positions: [0.0, -1.0, 1.5, 0.5, 0.0, 0.000], "
+            "time_from_start: {sec: 2, nanosec: 0}}]}\""
+        ],
+        shell=True,
+        output="screen",
+    )
+
     delayed_spawn_and_bridge = TimerAction(
         period=3.0,
         actions=[
@@ -198,6 +212,13 @@ def generate_launch_description():
         actions=[
             joint_state_broadcaster_spawner,
             arm_controller_spawner,
+        ],
+    )
+
+    delayed_initial_arm_pose = TimerAction(
+        period=9.0,
+        actions=[
+            initial_arm_pose,
         ],
     )
 
@@ -253,4 +274,5 @@ def generate_launch_description():
         gazebo,
         delayed_spawn_and_bridge,
         delayed_controllers,
+        delayed_initial_arm_pose,
     ])

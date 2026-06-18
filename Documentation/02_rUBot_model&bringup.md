@@ -576,13 +576,32 @@ joint_names:
 - arm_joint5
 - arm_joint6
 points:
-- positions: [0.0, 0.3, -0.3, 0.0, 0.0, 0.000]
+- positions: [0.0, -1.0, 2.0, 0.0, 0.0, 0.000]
   time_from_start: {sec: 1, nanosec: 0}
-- positions: [0.5, 0.5, -0.6, 0.2, 0.0, 0.005]
-  time_from_start: {sec: 3, nanosec: 0}
-- positions: [0.0, 0.0, 0.0, 0.0, 0.0, 0.000]
-  time_from_start: {sec: 5, nanosec: 0}
 " --once
 ````
 
 ![](./Images/02_rubot_model/Bringup_rubot_arm.png)
+
+- Trajectory sequence:
+````bash
+- control Joints:
+````bash
+ros2 topic pub /arm_controller/joint_trajectory trajectory_msgs/msg/JointTrajectory "
+joint_names:
+- arm_joint1
+- arm_joint2
+- arm_joint3
+- arm_joint4
+- arm_joint5
+- arm_joint6
+points:
+- positions: [0.0, -1.0, 1.0, 0.0, 0.0, 0.000]
+  time_from_start: {sec: 1, nanosec: 0}
+- positions: [0.5, -1.0, 2.0, 0.0, 0.0, 0.000]
+  time_from_start: {sec: 3, nanosec: 0}
+- positions: [0.5, -1.0, 2.0, 0.8, 0.0, 0.005]
+  time_from_start: {sec: 5, nanosec: 0}
+" --once
+````
+![](./Images/02_rubot_model/Bringup_rubot_arm2.png)

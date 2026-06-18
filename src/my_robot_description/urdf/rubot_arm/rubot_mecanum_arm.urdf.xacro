@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="rubot_mecanum">
 
+    <!-- ros2_control arguments -->
+    <xacro:arg name="use_gazebo_plugin" default="true"/>
+    <xacro:arg name="hardware_plugin" default="ign_ros2_control/IgnitionSystem"/>
+    <xacro:arg name="ros2_control_params" default=""/>
+
   <xacro:include filename="$(find my_robot_description)/urdf/rubot_arm/my_arm_mecanum_macro.xacro"/>
 
     <material name="yellow">
@@ -270,7 +275,7 @@
             </range>
             </ray>
             <always_on>true</always_on>
-            <visualize>true</visualize>
+            <visualize>false</visualize>
         </sensor>
     </gazebo>
 
@@ -285,8 +290,8 @@
             <camera>
             <horizontal_fov>1.047</horizontal_fov>
             <image>
-                <width>640</width>
-                <height>480</height>
+                <width>320</width>
+                <height>240</height>
                 <format>R8G8B8</format>
             </image>
             <clip>
@@ -295,59 +300,17 @@
             </clip>
             </camera>
             <always_on>true</always_on>
-            <visualize>true</visualize>
+            <visualize>false</visualize>
         </sensor>
     </gazebo>
-    <!-- =========================
-     ros2_control for SG90 arm in Gazebo
-     ========================= -->
 
-    <ros2_control name="ArmGazeboSystem" type="system">
-    <hardware>
-        <plugin>ign_ros2_control/IgnitionSystem</plugin>
-    </hardware>
-
-    <joint name="arm_joint1">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-
-    <joint name="arm_joint2">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-
-    <joint name="arm_joint3">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-
-    <joint name="arm_joint4">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-
-    <joint name="arm_joint5">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-
-    <joint name="arm_joint6">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-    </ros2_control>
-
-    <gazebo>
-    <plugin name="ign_ros2_control::IgnitionROS2ControlPlugin"
+    <xacro:if value="$(arg use_gazebo_plugin)">
+        <gazebo>
+            <plugin
+            name="ign_ros2_control::IgnitionROS2ControlPlugin"
             filename="libign_ros2_control-system.so">
-        <parameters>$(find my_robot_bringup)/config/arm_controllers.yaml</parameters>
-    </plugin>
-    </gazebo>
+            <parameters>$(arg ros2_control_params)</parameters>
+            </plugin>
+        </gazebo>
+    </xacro:if>
 </robot>
