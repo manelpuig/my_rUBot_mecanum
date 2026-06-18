@@ -114,7 +114,7 @@ def generate_launch_description():
             "/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist",
             "/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry",
             "/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan",
-            #"/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
+            "/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
 
             "/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image",
             #"/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo",

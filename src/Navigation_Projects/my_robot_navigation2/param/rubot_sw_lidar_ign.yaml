@@ -1,11 +1,12 @@
 amcl:
   ros__parameters:
     set_initial_pose: true
+    always_reset_initial_pose: true
     initial_pose:
-      x: 0.5
-      y: -1.5
+      x: 0.0
+      y: 0.0
       z: 0.0
-      yaw: 1.57
+      yaw: 0.0
     use_sim_time: True
     alpha1: 0.3   # Soroll rotacional degut a la rotació - augmenta (abans 0.2)
     alpha2: 0.3   # Soroll translacional degut a la rotació - augmenta (abans 0.2)
@@ -108,22 +109,24 @@ velocity_smoother:
     enable_stamped_cmd_vel: false
     feedback: "OPEN_LOOP"
 
-    max_velocity: [0.15, 0.05, 0.45]
-    min_velocity: [-0.02, -0.05, -0.45]
+    max_velocity: [0.30, 0.12, 0.8]
+    min_velocity: [-0.05, -0.12, -0.8]
 
-    max_accel: [0.8, 0.4, 0.9]
-    max_decel: [-0.8, -0.4, -0.9]
+    max_accel: [1.0, 0.8, 1.5]
+    max_decel: [-1.0, -0.8, -1.5]
 
     deadband_velocity: [0.005, 0.005, 0.005]
 
     velocity_timeout: 1.0
     odom_topic: "odom"
     odom_duration: 0.1
+    cmd_vel_in: "cmd_vel_nav"
+    cmd_vel_out: "cmd_vel"
 
 controller_server:
   ros__parameters:
     use_sim_time: True
-    controller_frequency: 8.0 #Abans 10.0
+    controller_frequency: 10.0 #Abans 10.0
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.001
     min_theta_velocity_threshold: 0.001
@@ -228,17 +231,17 @@ local_costmap:
           data_type: "LaserScan"
           clearing: True
           marking: True
-          raytrace_max_range: 3.0
+          raytrace_max_range: 2.0
           raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
+          obstacle_max_range: 1.5
           obstacle_min_range: 0.0
           max_obstacle_height: 2.0
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.30
-        cost_scaling_factor: 0.1
+        inflation_radius: 0.18
+        cost_scaling_factor: 3.0
 
       always_send_full_costmap: True
 
@@ -270,16 +273,16 @@ global_costmap:
           data_type: "LaserScan"
           clearing: True
           marking: True
-          raytrace_max_range: 3.0
+          raytrace_max_range: 2.0
           raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
+          obstacle_max_range: 1.5
           obstacle_min_range: 0.0
           max_obstacle_height: 2.0
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 0.5
-        cost_scaling_factor: 0.2
+        inflation_radius: 0.22
+        cost_scaling_factor: 3.0
 
       always_send_full_costmap: True
 

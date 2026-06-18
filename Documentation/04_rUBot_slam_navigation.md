@@ -56,6 +56,7 @@ These 3 packages are organized inside a `Navigation_Projects` subfolder on src f
     - In the case of Virtual environment:
         ````shell
         ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
+        ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_ign.world
         ````
         >Change the custom_world with the world name you have created
     - In the case of a real robot the bringup is already made when turned on the robot.
@@ -96,11 +97,13 @@ These 3 packages are organized inside a `Navigation_Projects` subfolder on src f
     - In the case of Virtual environment:
         ````shell
         ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=robot_arm/my_simple_robot.urdf custom_world:=square4m_sign.world
+        ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_ign.world
         ````
         >Change the URDF file for each robot
         - Launch Navigation node: python launcher is more powerfull than previous xml format
         ````bash
         ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=map_square4m_sign.yaml params_file:=rubot_sw.yaml 
+        ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=my_map3.yaml params_file:=rubot_sw_lidar_ign.yaml
         ````
         >An optimized set of Navigation parameters is set on rubot_sw_lidar.yaml:
         >    - Initial Pose is set

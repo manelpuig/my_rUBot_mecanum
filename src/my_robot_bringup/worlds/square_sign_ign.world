@@ -1,172 +1,172 @@
 <?xml version="1.0" ?>
 <sdf version="1.7">
-  <world name="square_sign_ign">
+    <world name="square_sign_ign">
 
-    <physics name="default_physics" type="ode">
-        <max_step_size>0.005</max_step_size>
-        <real_time_factor>1.0</real_time_factor>
-        <real_time_update_rate>200</real_time_update_rate>
-    </physics>
+        <physics name="default_physics" type="ode">
+            <max_step_size>0.005</max_step_size>
+            <real_time_factor>1.0</real_time_factor>
+            <real_time_update_rate>200</real_time_update_rate>
+        </physics>
 
-    <!-- Core Ignition systems (Fortress / Gazebo6) -->
-    <plugin filename="libignition-gazebo6-physics-system.so"
-            name="ignition::gazebo::systems::Physics"/>
+        <!-- Core Ignition systems (Fortress / Gazebo6) -->
+        <plugin filename="libignition-gazebo6-physics-system.so"
+                name="ignition::gazebo::systems::Physics"/>
 
-    <plugin filename="libignition-gazebo6-user-commands-system.so"
-            name="ignition::gazebo::systems::UserCommands"/>
+        <plugin filename="libignition-gazebo6-user-commands-system.so"
+                name="ignition::gazebo::systems::UserCommands"/>
 
-    <plugin filename="libignition-gazebo6-scene-broadcaster-system.so"
-            name="ignition::gazebo::systems::SceneBroadcaster"/>
+        <plugin filename="libignition-gazebo6-scene-broadcaster-system.so"
+                name="ignition::gazebo::systems::SceneBroadcaster"/>
 
-    <plugin filename="libignition-gazebo6-sensors-system.so"
-            name="ignition::gazebo::systems::Sensors">
-        <render_engine>ogre2</render_engine>
-    </plugin>
+        <plugin filename="libignition-gazebo6-sensors-system.so"
+                name="ignition::gazebo::systems::Sensors">
+            <render_engine>ogre2</render_engine>
+        </plugin>
 
-    
-    <!-- Scene configuration -->
-    <scene>
-      <ambient>0.6 0.6 0.6 1</ambient>
-      <background>0.8 0.8 0.8 1</background>
-      <shadows>false</shadows>
-      <grid>true</grid>
-    </scene>
+        
+        <!-- Scene configuration -->
+        <scene>
+        <ambient>0.6 0.6 0.6 1</ambient>
+        <background>0.8 0.8 0.8 1</background>
+        <shadows>false</shadows>
+        <grid>true</grid>
+        </scene>
 
-    <!-- Sun light -->
-    <light type="directional" name="sun">
-      <cast_shadows>false</cast_shadows>
-      <pose>0 0 10 0 0 0</pose>
-      <diffuse>0.8 0.8 0.8 1</diffuse>
-      <specular>0.2 0.2 0.2 1</specular>
-      <direction>-0.5 0.1 -0.9</direction>
-    </light>
+        <!-- Sun light -->
+        <light type="directional" name="sun">
+        <cast_shadows>false</cast_shadows>
+        <pose>0 0 10 0 0 0</pose>
+        <diffuse>0.8 0.8 0.8 1</diffuse>
+        <specular>0.2 0.2 0.2 1</specular>
+        <direction>-0.5 0.1 -0.9</direction>
+        </light>
 
-    <!-- Ground plane -->
-    <model name="ground_plane">
-      <static>true</static>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>20 20</size>
-            </plane>
-          </geometry>
-        </collision>
+        <!-- Ground plane -->
+        <model name="ground_plane">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+            <geometry>
+                <plane>
+                <normal>0 0 1</normal>
+                <size>20 20</size>
+                </plane>
+            </geometry>
+            </collision>
 
-        <visual name="visual">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>20 20</size>
-            </plane>
-          </geometry>
-          <material>
-            <ambient>0.8 0.8 0.8 1</ambient>
-            <diffuse>0.8 0.8 0.8 1</diffuse>
-            <specular>0.1 0.1 0.1 1</specular>
-          </material>
-        </visual>
-      </link>
-    </model>
+            <visual name="visual">
+            <geometry>
+                <plane>
+                <normal>0 0 1</normal>
+                <size>20 20</size>
+                </plane>
+            </geometry>
+            <material>
+                <ambient>0.8 0.8 0.8 1</ambient>
+                <diffuse>0.8 0.8 0.8 1</diffuse>
+                <specular>0.1 0.1 0.1 1</specular>
+            </material>
+            </visual>
+        </link>
+        </model>
 
-    <!-- Camera projection -->
-    <gui fullscreen="0">
-    <camera name="bird_view">
-        <pose>0 0 12 0 1.5708 0</pose>
-        <projection_type>orthographic</projection_type>
-    </camera>
-    </gui>
+        <!-- Camera projection -->
+        <gui fullscreen="0">
+            <camera name="bird_view">
+                <pose>0 0 5 0 1.5708 0</pose>
+                <projection_type>orthographic</projection_type>
+            </camera>
+        </gui>
 
-    <!-- Sign model -->
-    <include>
-      <uri>model://sign_left_gz</uri>
-      <pose>0.5 0 0 0 0 1.57</pose>
-    </include>
-    <!-- Wall120cm 1 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_1</name>
-      <pose>2.5 0 0.15 0 0 1.57</pose>
-    </include>
-    <!-- Wall90cm 1 -->
-    <include>
-      <uri>model://wall90cm</uri>
-      <name>wall90_1</name>
-      <pose>1 0 0.15 0 0 0</pose>
-    </include>
-    <!-- A wall120cm 2 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_2</name>
-      <pose>2.5 1.2 0.15 0 0 1.57</pose>
-    </include>
-    <!-- A wall120cm 3 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_3</name>
-      <pose>2.5 -1.2 0.15 0 0 1.57</pose>
-    </include>
-    <!-- A wall120cm 4 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_4</name>
-      <pose>1.9 -1.8 0.15 0 0 0</pose>
-    </include>
-    <!-- A wall120cm 5 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_5</name>
-      <pose>1.9 1.8 0.15 0 0 0</pose>
-    </include>
-    <!-- A wall120cm 6 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_6</name>
-      <pose>0.7 1.8 0.15 0 0 0</pose>
-    </include>
-    <!-- A wall120cm 7 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_7</name>
-      <pose>-0.5 1.8 0.15 0 0 0</pose>
-    </include>
-    <!-- A wall120cm 8 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_8</name>
-      <pose>0.7 -1.8 0.15 0 0 0</pose>
-    </include>
-    <!-- A wall120cm 9 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_9</name>
-      <pose>-0.5 -1.8 0.15 0 0 0</pose>
-    </include>
-    <!-- Wall120cm 10 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_10</name>
-      <pose>-1.1 0 0.15 0 0 1.57</pose>
-    </include>
-    <!-- A wall120cm 11 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_11</name>
-      <pose>-1.1 1.2 0.15 0 0 1.57</pose>
-    </include>
-    <!-- A wall120cm 12 -->
-    <include>
-      <uri>model://wall120cm</uri>
-      <name>wall120_12</name>
-      <pose>-1.1 -1.2 0.15 0 0 1.57</pose>
-    </include>
-    <!-- Wall90cm 2 -->
-    <include>
-      <uri>model://wall90cm</uri>
-      <name>wall90_2</name>
-      <pose>1.45 0.45 0.15 0 0 1.57</pose>
-    </include>
+        <!-- Sign model -->
+        <include>
+        <uri>model://sign_left_gz</uri>
+        <pose>0.5 0 0 0 0 1.57</pose>
+        </include>
+        <!-- Wall120cm 1 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_1</name>
+        <pose>2.5 0 0.15 0 0 1.57</pose>
+        </include>
+        <!-- Wall90cm 1 -->
+        <include>
+        <uri>model://wall90cm</uri>
+        <name>wall90_1</name>
+        <pose>1 0 0.15 0 0 0</pose>
+        </include>
+        <!-- A wall120cm 2 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_2</name>
+        <pose>2.5 1.2 0.15 0 0 1.57</pose>
+        </include>
+        <!-- A wall120cm 3 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_3</name>
+        <pose>2.5 -1.2 0.15 0 0 1.57</pose>
+        </include>
+        <!-- A wall120cm 4 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_4</name>
+        <pose>1.9 -1.8 0.15 0 0 0</pose>
+        </include>
+        <!-- A wall120cm 5 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_5</name>
+        <pose>1.9 1.8 0.15 0 0 0</pose>
+        </include>
+        <!-- A wall120cm 6 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_6</name>
+        <pose>0.7 1.8 0.15 0 0 0</pose>
+        </include>
+        <!-- A wall120cm 7 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_7</name>
+        <pose>-0.5 1.8 0.15 0 0 0</pose>
+        </include>
+        <!-- A wall120cm 8 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_8</name>
+        <pose>0.7 -1.8 0.15 0 0 0</pose>
+        </include>
+        <!-- A wall120cm 9 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_9</name>
+        <pose>-0.5 -1.8 0.15 0 0 0</pose>
+        </include>
+        <!-- Wall120cm 10 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_10</name>
+        <pose>-1.1 0 0.15 0 0 1.57</pose>
+        </include>
+        <!-- A wall120cm 11 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_11</name>
+        <pose>-1.1 1.2 0.15 0 0 1.57</pose>
+        </include>
+        <!-- A wall120cm 12 -->
+        <include>
+        <uri>model://wall120cm</uri>
+        <name>wall120_12</name>
+        <pose>-1.1 -1.2 0.15 0 0 1.57</pose>
+        </include>
+        <!-- Wall90cm 2 -->
+        <include>
+        <uri>model://wall90cm</uri>
+        <name>wall90_2</name>
+        <pose>1.45 0.45 0.15 0 0 1.57</pose>
+        </include>
 
-  </world>
+    </world>
 </sdf>

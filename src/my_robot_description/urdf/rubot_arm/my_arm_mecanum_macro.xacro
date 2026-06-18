@@ -71,7 +71,7 @@
         </geometry>
       </collision>
       <xacro:inertial_box
-        mass="0.08"
+        mass="0.008"
         x="0.08"
         y="0.08"
         z="0.03"
@@ -104,7 +104,7 @@
         </geometry>
       </collision>
       <xacro:inertial_cylinder_z
-        mass="0.03"
+        mass="0.003"
         radius="0.012"
         length="0.055"
         ox="0"
@@ -136,7 +136,7 @@
         </geometry>
       </collision>
       <xacro:inertial_cylinder_x
-        mass="0.025"
+        mass="0.0025"
         radius="0.012"
         length="0.075"
         ox="0.0375"
@@ -168,7 +168,7 @@
         </geometry>
       </collision>
       <xacro:inertial_cylinder_x
-        mass="0.025"
+        mass="0.0025"
         radius="0.012"
         length="0.075"
         ox="0.0375"
@@ -200,7 +200,7 @@
         </geometry>
       </collision>
       <xacro:inertial_cylinder_x
-        mass="0.015"
+        mass="0.0015"
         radius="0.010"
         length="0.045"
         ox="0.0225"
@@ -232,7 +232,7 @@
         </geometry>
       </collision>
       <xacro:inertial_box
-        mass="0.02"
+        mass="0.002"
         x="0.030"
         y="0.030"
         z="0.025"
@@ -265,7 +265,7 @@
         </geometry>
     </collision>
     <xacro:inertial_box
-        mass="0.005"
+        mass="0.0005"
         x="0.050"
         y="0.008"
         z="0.012"
@@ -296,7 +296,7 @@
         </geometry>
     </collision>
     <xacro:inertial_box
-        mass="0.005"
+        mass="0.0005"
         x="0.050"
         y="0.008"
         z="0.012"
@@ -373,7 +373,27 @@
             <state_interface name="velocity"/>
         </joint>
     </ros2_control>
-
+    <gazebo reference="${prefix}arm_base_link">
+        <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link1">
+        <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link2">
+        <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link3">
+        <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link4">
+        <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link5">
+        <gravity>false</gravity>
+    </gazebo>
+    <gazebo reference="${prefix}link6">
+        <gravity>false</gravity>
+    </gazebo>
   </xacro:macro>
 
 </robot>
