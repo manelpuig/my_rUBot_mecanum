@@ -534,6 +534,9 @@ When you are using the virtual environment to simulate the robot behavior you ha
   ````
   > The argument `use_sim_time` is by default true in this launch file
 
+  ![](./Images/02_rubot_model/rubot_brinup_gz.png)
+  ![](./Images/02_rubot_model/rubot_brinup_rviz_gz.png)
+
 - In a new terminal, launch the teleop-twist-keyboard:
   ```shell
   ros2 run teleop_twist_keyboard teleop_twist_keyboard
@@ -546,11 +549,11 @@ When you are using the virtual environment to simulate the robot behavior you ha
 
   ![](./Images/02_rubot_model/07_rosgraph.png)
 
-### **Real robot**
+#### **Real robot**
 
 When you are using the real robot, the bringup is already done. You need only to view the topics with:
 ```shell
-ros2 launch my_robot_description display.launch.py use_sim_time:=false robot_model:=rubot_arm/rubot_mecanum_arm.urdf.xacro
+ros2 launch my_robot_description display.launch.py use_sim_time:=false robot_model:=rubot_arm/rubot_mecanum.urdf.xacro
 ````
 > In real robot, we use `use_sim_time:=false` 
 
