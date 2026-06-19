@@ -530,7 +530,7 @@ sudo apt install ros-humble-teleop-twist-keyboard
 When you are using the virtual environment to simulate the robot behavior you have to:
 - Bringup our robot in Gazebo virtual environment
   ````shell
-  ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=0.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square3m_walls.world
+  ros2 launch my_robot_bringup my_robot_bringup_gz.launch.xml robot:=rubot_arm/rubot_mecanum_arm.urdf.xacro custom_world:=square_sign_ign.world
   ````
   > The argument `use_sim_time` is by default true in this launch file
 
@@ -546,26 +546,31 @@ When you are using the virtual environment to simulate the robot behavior you ha
 
   ![](./Images/02_rubot_model/07_rosgraph.png)
 
-#### **Real robot**
+### **Real robot**
 
 When you are using the real robot, the bringup is already done. You need only to view the topics with:
 ```shell
-ros2 launch my_robot_description display.launch.py use_sim_time:=false robot_model:=robot_arm/my_simple_robot.urdf
+ros2 launch my_robot_description display.launch.py use_sim_time:=false robot_model:=rubot_arm/rubot_mecanum_arm.urdf.xacro
 ````
-> In real robot, we use `use_sim_time:=false` and `robot_model:=robot_arm/my_simple_robot.urdf`. This has to be specified when launching display.launch.py file
+> In real robot, we use `use_sim_time:=false` 
 
 Launch the teleop-twist-keyboard control node:
 ```shell
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
-## Bringup my robot arm
+## Bringup the rUBot with a mecanum arm
 
+### In virtual environment
 - Bringup the robot:
 ````bash
 ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py  robot_model:=rubot_arm/rubot_mecanum_arm.urdf.xacro
 ````
-- control Joints:
+- Launch the teleop-twist-keyboard control node to control the robot movement:
+```shell
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+- To control Joint angles:
 ````bash
 ros2 topic pub /arm_controller/joint_trajectory trajectory_msgs/msg/JointTrajectory "
 joint_names:
@@ -583,7 +588,7 @@ points:
 
 ![](./Images/02_rubot_model/Bringup_rubot_arm.png)
 
-- Trajectory sequence:
+- To terform a trajectory sequence:
 ````bash
 - control Joints:
 ````bash
@@ -605,3 +610,13 @@ points:
 " --once
 ````
 ![](./Images/02_rubot_model/Bringup_rubot_arm2.png)
+
+### **Real robot**
+
+When using the real robot, the bringup is already made on poweron as a service, but if you want to launch manually you will have to type:
+
+````bash
+ros2 launch my_robot_bringup my_robot_arm_bringup_hw.launch.py 
+````
+
+You can test the robot movement and the joint angles with the same instructions as in virtual environment
