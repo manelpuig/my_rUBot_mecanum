@@ -32,7 +32,7 @@ services:
       # Entry point script
       - ./entrypoint_pc.sh:/entrypoint_pc.sh:ro
       # Timezone from host (for correct log timestamps)
-      - /etc/localtime:/etc/localtime:ro
+      #- /etc/localtime:/etc/localtime:ro
       # X11 display for RViz/Gazebo
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       # GPU / rendering devices (if needed)

@@ -9,13 +9,18 @@ This image can be used for:
 - **LAB use**: on PC-ubuntu/linux (docker-compose.yaml) to connect with the rUBot hardware.
 
 **Students** in the lab they only need to:
-- Verify you have installed `Docker Engine`, `Docker Desktop` and `Docker Compose plugin` from the official Docker repositories. Open Docker Desktop on your Host PC.
+- Verify you have installed `Docker Engine` and `Docker Compose plugin` from the official Docker repositories. 
 - Open VScode in a working directory (e.g., `~/Desktop/rob/`) on your Host PC.
     - Install the `Docker` and `Remote Development` extensions from the VScode marketplace.
     - Clone your forked repository `my_rUBot_mecanum`
-
+- Verify if you have added your user to the Docker group (to avoid using sudo for Docker commands)
+```bash
+sudo usermod -aG docker $USER
+sudo reboot
+```
 
 **PC-ubuntu/linux** will work on SIM and LAB use. docker-compose.yaml is configured by default for LAB use.
+
 - In `~/my_rUBot_mecanum/network_config/humble` review in function of SIM or LAB case, on:
     - `docker-compose.yaml` file: 
         - `ROS_DOMAIN_ID=1` variable to match your Group number.
