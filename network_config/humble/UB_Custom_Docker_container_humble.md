@@ -30,6 +30,7 @@ sudo reboot
 
 - Open a terminal in `~/my_rUBot_mecanum/network_config/humble` and run:
     ````bash
+    chmod +x entrypoint_pc.sh
     xhost +local:root            # only in case of Host Ubuntu to allow X11 for Docker 
     docker compose up
     ````
@@ -39,13 +40,24 @@ sudo reboot
     docker exec -it pc_humble bash
     code .  # to open VSCode inside the container
     ```
-- Clone your ws in `/root/`
+- Clone and compile your ws in `/root/`
 - Verify in container **.bashrc** to have:
     ```bash
     source /opt/ros/humble/setup.bash
-    source /root//my_rUBot_mecanum/install/setup.bash
+    source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
+    # --- Your workspace ---
+    source /home/student/Desktop/my_rUBot_mecanum/install/setup.bash
+    cd ~/Desktop/my_rUBot_mecanum
     export QT_QPA_PLATFORM=xcb  # good default for RViz2 on many systems
-    cd /root/my_rUBot_mecanum
+    # --- ROS 2 networking ---
+    export ROS_DOMAIN_ID=1 # Group number 1
+    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    # Sim mode SUBNET / Lab mode OFF
+    export ROS_AUTOMATIC_DISCOVERY_RANGE=OFF
+    # Sim mode unset / Lab mode robot IP
+    export ROS_STATIC_PEERS=192.168.1.14  # robot IP (14,24,34 or 44)
+    # CycloneDDS XML. Not necessary
+    export CYCLONEDDS_URI=file:///config/cyclonedds_pc.xml
     ```
 You are ready to work inside the container and to connect to the robot hardware within ROS2 Humble on Docker!
 
