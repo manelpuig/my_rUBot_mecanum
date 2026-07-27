@@ -6,7 +6,14 @@
     <xacro:arg name="hardware_plugin" default="ign_ros2_control/IgnitionSystem"/>
     <xacro:arg name="ros2_control_params" default=""/>
 
-  <xacro:include filename="$(find my_robot_description)/urdf/rubot_arm/my_arm_mecanum_macro.xacro"/>
+  <xacro:include filename="$(find my_robot_description)/urdf/rubot_arm/my_arm_mecanum_5dof_macro.xacro"/>
+
+  <xacro:my_arm_mecanum_5dof
+    prefix="arm_"
+    parent="base_link"
+    xyz="-0.08 0.0 0.09"
+    rpy="0 0 3.14159"
+    hardware_plugin="ign_ros2_control/IgnitionSystem"/>
 
     <material name="yellow">
         <color rgba="0.8 0.8 0.0 1.0"/>
@@ -221,13 +228,6 @@
         <material name="green"/>
     </visual>
   </link>
-
-  <!-- ===== SG90 arm mounted on mecanum base ===== -->
-  <xacro:my_arm_mecanum
-    prefix="arm_"
-    parent="base_link"
-    xyz="-0.08 0.00 0.09"
-    rpy="0 0 3.14"/>
 
     <!-- =========================
         Gazebo plugins
