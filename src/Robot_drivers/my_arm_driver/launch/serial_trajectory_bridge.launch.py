@@ -1,7 +1,6 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-
 from launch_ros.actions import Node
 
 
@@ -10,7 +9,7 @@ def generate_launch_description():
     serial_port_arg = DeclareLaunchArgument(
         "serial_port",
         default_value="/dev/ttyUSB0",
-        description="Serial port connected to the Arduino Nano ESP32",
+        description="Serial port connected to the arm Arduino Nano ESP32",
     )
 
     baudrate_arg = DeclareLaunchArgument(
@@ -26,7 +25,7 @@ def generate_launch_description():
         Node(
             package="my_arm_driver",
             executable="serial_trajectory_bridge_node",
-            name="serial_trajectory_bridge",
+            name="arm_serial_trajectory_bridge",
             output="screen",
             parameters=[{
                 "serial_port": LaunchConfiguration("serial_port"),
@@ -48,6 +47,11 @@ def generate_launch_description():
                 "servo_sign": [1, 1, 1, 1, 1, 1],
                 "servo_min_deg": [0, 0, 0, 0, 0, 0],
                 "servo_max_deg": [180, 180, 180, 180, 180, 180],
+
+                "initial_joints_deg": [
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+                ],
+                "send_initial_position": False,
             }],
         ),
     ])
