@@ -30,6 +30,17 @@
     <material name="green">
         <color rgba="0.2 0.7 0.2 1.0"/>
     </material>
+    <material name="servo">
+      <color rgba="0.08 0.08 0.08 1.0"/>
+    </material>
+
+    <material name="metal">
+      <color rgba="0.45 0.45 0.45 1.0"/>
+    </material>
+
+    <material name="red">
+      <color rgba="0.80 0.05 0.05 1.0"/>
+    </material>
 
   <link name="base_link">
     <!-- Visual (per RViz) -->
@@ -67,8 +78,8 @@
   <link name="base_footprint"/>
 
   <joint name="base_link_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="base_footprint"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 

@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 100
+    update_rate: 200
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -27,3 +27,4 @@ arm_controller:
 
     allow_partial_joints_goal: false
     open_loop_control: true
+    allow_nonzero_velocity_at_trajectory_end: false
