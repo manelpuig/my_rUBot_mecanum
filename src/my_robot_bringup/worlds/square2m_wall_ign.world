@@ -71,10 +71,13 @@
 
     <!-- Camera projection -->
     <gui fullscreen="0">
-      <camera name="top_view">
-        <pose>0.0 0.0 0.2 0.0 1.5708 0.0</pose>
-        <projection_type>orthographic</projection_type>
-      </camera>
+      <plugin filename="MinimalScene" name="3D View">
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <camera_pose>0 0 2.5 0 1.5708 0</camera_pose>
+      </plugin>
+
+      <plugin filename="GzSceneManager" name="Scene Manager"/>
     </gui>
 
     <!-- Square 2 m boundary, centred at the world origin -->
