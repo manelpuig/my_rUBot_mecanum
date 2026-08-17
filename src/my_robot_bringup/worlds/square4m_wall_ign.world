@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.8">
-  <world name="square4mwall">
+  <world name="square4m_wall_ign">
 
     <physics name="default_physics" type="ode">
       <max_step_size>0.005</max_step_size>
@@ -77,12 +77,13 @@
     </include>
 
     <!-- 60 cm wall attached to the midpoint of the right-hand side.
-         Its centre is at x=1.7 m, so it extends from x=1.4 m to x=2.0 m,
+         Its centre is at x=1.675 m, so it extends from x=1.375 m to the
+         inner face of the boundary at x=1.975 m,
          perpendicular to the boundary and towards the inside of the square. -->
     <include>
       <uri>model://wall60cm</uri>
       <name>wall60_inward</name>
-      <pose>1.7 0 0.15 0 0 0</pose>
+      <pose>1.675 0 0.15 0 0 0</pose>
     </include>
 
   </world>

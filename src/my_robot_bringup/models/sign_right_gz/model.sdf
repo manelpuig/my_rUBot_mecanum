@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="sign_right_gz">
+    <static>true</static>
+
+    <link name="stand">
+      <visual name="stand_visual">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://sign_right_gz/meshes/sign_stand.obj</uri>
+            <scale>0.1 0.1 0.1</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0 0 0 1</ambient>
+          <diffuse>0 0 0 1</diffuse>
+          <specular>0.05 0.05 0.05 1</specular>
+        </material>
+      </visual>
+      <collision name="stand_collision">
+        <pose>0.001343 0.067500 0.000997 0 0 0</pose>
+        <geometry><box><size>0.093711 0.135000 0.066794</size></box></geometry>
+      </collision>
+    </link>
+
+    <link name="board">
+      <pose>-0.02 0 0.19 -1.57 0 0</pose>
+      <visual name="board_visual">
+        <geometry>
+          <mesh>
+            <uri>model://sign_right_gz/meshes/sign_board.obj</uri>
+            <scale>0.1 0.1 0.1</scale>
+          </mesh>
+        </geometry>
+        <cast_shadows>false</cast_shadows>
+        <material>
+          <pbr>
+            <metal>
+              <albedo>1 1 1 1</albedo>
+              <albedo_map>model://sign_right_gz/materials/textures/right.png</albedo_map>
+              <emissive>0.3 0.3 0.3 1</emissive>
+              <emissive_map>model://sign_right_gz/materials/textures/right.png</emissive_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <collision name="board_collision">
+        <geometry><box><size>0.134000 0.114375 0.016019</size></box></geometry>
+      </collision>
+    </link>
+
+    <joint name="stand_to_board" type="fixed">
+      <parent>stand</parent>
+      <child>board</child>
+    </joint>
+  </model>
+</sdf>
