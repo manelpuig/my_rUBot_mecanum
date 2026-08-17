@@ -98,7 +98,7 @@ A first simple control program is created to move the robot according to a speci
 
 - We first bring up the robot in a specific world at the desired pose:
 ```shell
-ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square4m_wall_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=1.0 y:=1.0 yaw:=1.8
+ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square4m_wall_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=1.5 y:=-1.5 yaw:=0.5
 ```
 ![](./Images/03_Control/06_bringup_sw.png)
 
@@ -238,7 +238,7 @@ Let's verify first this behaviour in virtual environment
 
 We have to launch the "my_robot_selfcontrol.launch.xml" file in the "my_robot_control" package.
 ```shell
-ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square4m_wall_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=1.0 y:=1.0 yaw:=1.8
+ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square4m_wall_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=1.5 y:=-1.5 yaw:=0.5
 ros2 launch my_robot_control my_robot_selfcontrol.launch.xml time_to_stop:=10.0
 ```
 >- Verify in rviz if you have to change the fixed frame to "odom" frame
@@ -278,7 +278,12 @@ The `my_robot_wallfollower.py` node divides the valid LiDAR readings into four a
 - `RIGHT`: -110° to -70°.
 - `BACK_RIGHT`: -160° to -110°.
 
-The controller evaluates these regions in priority order. A front or front-right obstacle makes the robot turn left. When the right wall is visible, the robot moves forward, turns left if it is too close, or turns right if it is too far. A back-right reading makes it turn strongly to the right. If no wall is visible, the robot stops. The current implementation behaves as a differential-drive controller because it always sets `linear.y` to zero; using lateral velocity is proposed as a holonomic extension in the activity below.
+The controller evaluates these regions in priority order. A front or front-right obstacle makes the robot turn left. When the right wall is visible, the robot follows it. When the right reading is far but the back-right reading is close, the robot turns right around the end of the wall. If no wall is visible, the robot stops.
+
+Two wall-follower nodes are available:
+
+- **Differential version — `my_robot_wallfollower.py`:** uses forward velocity (`linear.x`) and rotation (`angular.z`). It turns left or right to maintain the desired distance from the right wall.
+- **Holonomic version — `my_rubot_wallfollower_holonomic.py`:** also uses lateral velocity (`linear.y`). While following the right wall, it corrects the lateral distance and uses a proportional rotation to align the robot with the wall.
 
 The algorithm is based on LiDAR range tests and specific actions for each region:
 ![](./Images/03_Control/10_lidar_rg.png)
@@ -287,9 +292,16 @@ The algorithm is based on LiDAR range tests and specific actions for each region
 
 We have to launch the "my_robot_wallfollower.launch.xml" file in the "my_robot_control" package.
 ```shell
-ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square4m_wall_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=1.0 y:=1.0 yaw:=1.8
+ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square4m_wall_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=1.5 y:=-1.5 yaw:=0.5
 ros2 launch my_robot_control my_robot_wallfollower.launch.xml time_to_stop:=50.0
 ```
+
+To test the holonomic version, keep the same simulation running and execute:
+
+```shell
+ros2 launch my_robot_control my_rubot_wallfollower_holonomic.launch.py time_to_stop:=50.0
+```
+
 >- You can test the behaviour by tuning the defined parameters
 
 **Activity: rUBot wall-follower**
@@ -301,8 +313,8 @@ The objective of this activity is to modify the code to move the robot in a holo
 - When the minimum distance is in the back-right side move the robot over the front-right side
 - When the minimum distance is in the back side move the robot over the right side
 
-Design the code using the holonomic robot capabilities, and upload:
-- the file "my_robot_wallfollower_holonomic.py"
+Test the code using the holonomic robot capabilities, and upload:
+- the file `my_rubot_wallfollower_holonomic.py`
 - a video of the current behaviour in your designed world
 
 **REAL robot**
