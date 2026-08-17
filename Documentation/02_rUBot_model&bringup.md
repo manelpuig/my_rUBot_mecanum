@@ -434,7 +434,7 @@ To select a world and an initial robot pose:
 
 ```bash
 ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py \
-  world:=square_sign_ign.world \
+  world:=square_sign_left_ign.world \
   robot_model:=rubot/rubot_mecanum.urdf.xacro \
   robot_name:=rubot_mecanum \
   x:=0.0 \
@@ -689,7 +689,7 @@ Vertical wall:
 </include>
 ```
 
-Use `square_sign_ign.world` as a complete reference showing how several reusable models can be included and positioned.
+Use `square_sign_left_ign.world` and `square_sign_right_ign.world` as complete references showing how several reusable models can be included and positioned.
 
 #### **Activity: create the group laboratory world**
 

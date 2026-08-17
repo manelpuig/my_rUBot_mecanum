@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.8">
-  <model name="sign_left_gz">
+  <model name="sign_left_ign">
     <static>true</static>
 
     <!-- Stand -->
@@ -11,7 +11,7 @@
         <pose>0 0 0 1.5708 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://sign_left_gz/meshes/sign_stand.obj</uri>
+            <uri>model://sign_left_ign/meshes/sign_stand.obj</uri>
             <scale>0.1 0.1 0.1</scale>
           </mesh>
         </geometry>
@@ -41,7 +41,7 @@
         <visual name="board_visual">
             <geometry>
                 <mesh>
-                <uri>model://sign_left_gz/meshes/sign_board.obj</uri>
+                <uri>model://sign_left_ign/meshes/sign_board.obj</uri>
                 <scale>0.1 0.1 0.1</scale>
                 </mesh>
             </geometry>
@@ -50,10 +50,10 @@
                 <pbr>
                 <metal>
                     <albedo>1 1 1 1</albedo>
-                    <albedo_map>model://sign_left_gz/materials/textures/left.png</albedo_map>
+                    <albedo_map>model://sign_left_ign/materials/textures/left.png</albedo_map>
                     <!-- Sempre visible -->
                     <emissive>0.3 0.3 0.3 1</emissive>
-                    <emissive_map>model://sign_left_gz/materials/textures/left.png</emissive_map>
+                    <emissive_map>model://sign_left_ign/materials/textures/left.png</emissive_map>
                 </metal>
                 </pbr>
             </material>

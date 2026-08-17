@@ -80,7 +80,7 @@
 
         <!-- Sign model -->
         <include>
-        <uri>model://sign_left_gz</uri>
+        <uri>model://sign_right_ign</uri>
         <pose>0.5 0 0 0 0 1.57</pose>
         </include>
         <!-- Wall120cm 1 -->
