@@ -77,9 +77,17 @@
         <camera_pose>0 0 2.5 0 1.5708 0</camera_pose>
       </plugin>
 
-      <plugin filename="GzSceneManager" name="Scene Manager"/>
+      <plugin filename="GzSceneManager" name="Scene Manager">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
     </gui>
-
+    
     <!-- Square 2 m boundary, centred at the world origin -->
     <include>
       <uri>model://square2m</uri>
