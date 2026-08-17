@@ -5,9 +5,10 @@ The objectives of this section are:
 - Setup the robot project for real control
 - Syncronization of the project with github
 
-We have two kind of rbots:
+We have 3 kind of rbots:
 - UB custom made **rUBot_mecanum**
 - Commercial **LIMO** robot
+- Commercial **ROSbot** robot
 
 ![](./Images/01_Setup/rUBot_Limo_ROSbot.png)
 
@@ -63,12 +64,8 @@ In the case of **TheConstruct interface** environment:
   source /opt/ros/humble/setup.bash
   source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
   source /home/user/my_rUBot_mecanum/install/setup.bash
-  cd /home/user/my_rUBot_mecanum
   export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-  export GAZEBO_MODEL_PATH=/home/user/my_rUBot_mecanum/src/my_robot_bringup/models:$GAZEBO_MODEL_PATH
-  
-  #git config --global user.email "xxx@alumnes.ub.edu"
-  #git config --global user.name "your_github_username"
+  cd /home/user/my_rUBot_mecanum
   ````
   > Copy and modify the `user.email` and `user.name` accordingly.
 - If the compilation process returns warnings on "Deprecated setup tools", proceed with:
@@ -77,7 +74,7 @@ In the case of **TheConstruct interface** environment:
   pip3 list | grep setuptools
   pip3 install setuptools==58.2.0
   ````
-- If the compilation process returns wardings on PREFIX_PATH:
+- If the compilation process returns warnings on PREFIX_PATH:
   ````shell
   unset COLCON_PREFIX_PATH
   unset AMENT_PREFIX_PATH
@@ -131,7 +128,6 @@ If you have Ubuntu22.04, follow instructions:
     source /home/<your_user>/Desktop/my_rUBot_mecanum/install/setup.bash
     cd ~/Desktop/my_rUBot_mecanum
     # --- Gazebo / RViz usability ---
-    export GAZEBO_MODEL_PATH=/home/<your_user>/Desktop/my_rUBot_mecanum/src/my_robot_bringup/models:${GAZEBO_MODEL_PATH}
     export QT_QPA_PLATFORM=xcb  # good default for RViz2 on many systems
     # --- ROS 2 networking ---
     export ROS_DOMAIN_ID=1 # Group number 1
