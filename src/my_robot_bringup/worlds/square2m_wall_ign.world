@@ -69,6 +69,14 @@
       </link>
     </model>
 
+    <!-- Camera projection -->
+    <gui fullscreen="0">
+      <camera name="top_view">
+        <pose>0 0 2 0 1.5708 0</pose>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+
     <!-- Square 2 m boundary, centred at the world origin -->
     <include>
       <uri>model://square2m</uri>
