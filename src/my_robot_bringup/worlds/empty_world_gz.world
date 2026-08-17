@@ -77,5 +77,61 @@
       </link>
     </model>
 
+    <!-- Gazebo Sim GUI -->
+    <gui fullscreen="0">
+      <plugin filename="MinimalScene" name="3D View">
+        <gz-gui>
+          <title>3D View</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <camera_pose>0 0 2.5 0 1.5708 0</camera_pose>
+      </plugin>
+
+      <plugin filename="GzSceneManager" name="Scene Manager">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="InteractiveViewControl" name="Interactive view control">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="CameraTracking" name="Camera Tracking">
+        <gz-gui>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="ComponentInspector" name="Component inspector"/>
+      <plugin filename="EntityTree" name="Entity tree"/>
+    </gui>
+
   </world>
 </sdf>

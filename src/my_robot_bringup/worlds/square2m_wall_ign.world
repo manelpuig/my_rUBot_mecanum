@@ -84,7 +84,7 @@
         <scene>scene</scene>
 
         <!-- x y z roll pitch yaw -->
-        <camera_pose>0 0.0 3.0 0 1.57 0.0</camera_pose>
+        <camera_pose>0 0 2.5 0 1.5708 0</camera_pose>
       </plugin>
 
       <!-- Internal scene updater: hidden as a tiny floating component -->
