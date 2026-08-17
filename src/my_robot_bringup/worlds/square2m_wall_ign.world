@@ -84,7 +84,7 @@
         <scene>scene</scene>
 
         <!-- x y z roll pitch yaw -->
-        <camera_pose>0 0.0 2.5 0 1.57 1.5708</camera_pose>
+        <camera_pose>0 0.0 3.0 0 1.57 0.0</camera_pose>
       </plugin>
 
       <!-- Internal scene updater: hidden as a tiny floating component -->
@@ -122,6 +122,17 @@
         </gz-gui>
       </plugin>
 
+      <!-- Move To and Follow implementation -->
+      <plugin filename="CameraTracking"
+              name="Camera Tracking">
+        <gz-gui>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
       <!-- Object properties -->
       <plugin filename="ComponentInspector"
               name="Component inspector"/>
@@ -131,7 +142,7 @@
               name="Entity tree"/>
 
     </gui>
-    
+
     <!-- Square 2 m boundary, centred at the world origin -->
     <include>
       <uri>model://square2m</uri>
