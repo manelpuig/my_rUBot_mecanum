@@ -138,14 +138,14 @@ controller_server:
     # Progress checker parameters
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.04
-      movement_time_allowance: 15.0
+      required_movement_radius: 0.03
+      movement_time_allowance: 35.0
 
     general_goal_checker:
-      stateful: true
+      stateful: false
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.40
-      yaw_goal_tolerance: 0.52  # 30 degrees
+      xy_goal_tolerance: 0.35   # Augmenta la tolerància de posició XY (abans 0.25)
+      yaw_goal_tolerance: 0.4 # Augmenta la tolerància d'orientació (aproximadament 45 graus, abans 0.25 radians)
 
     # DWB parameters
     FollowPath:
@@ -173,9 +173,9 @@ controller_server:
       decel_lim_y: -1.0
       decel_lim_theta: -2.0
 
-      vx_samples: 10
-      vy_samples: 8
-      vtheta_samples: 16
+      vx_samples: 12
+      vy_samples: 5
+      vtheta_samples: 15
 
       sim_time: 1.5
       linear_granularity: 0.05
@@ -194,9 +194,9 @@ controller_server:
       - PathDist
       - GoalDist
 
-      BaseObstacle.scale: 0.8
-      PathAlign.scale: 8.0
-      PathAlign.forward_point_distance: 0.20
+      BaseObstacle.scale: 6.0
+      PathAlign.scale: 4.0
+      PathAlign.forward_point_distance: 0.7
       GoalAlign.scale: 2.0
       GoalAlign.forward_point_distance: 0.5
       PathDist.scale: 3.0
@@ -244,7 +244,7 @@ local_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 5.0
+        cost_scaling_factor: 2.5
 
       always_send_full_costmap: True
 
@@ -269,8 +269,8 @@ global_costmap:
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 0.20
-        cost_scaling_factor: 5.0
+        inflation_radius: 0.25
+        cost_scaling_factor: 2.5
 
       always_send_full_costmap: True
 

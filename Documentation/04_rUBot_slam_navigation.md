@@ -132,6 +132,14 @@ When using **Gazebo Virtual environment**:
   `rubot_sw_ign.yaml` is the general Gazebo Sim configuration, whereas `rubot_sw_lidar_ign.yaml` contains the configuration optimized specifically for lidar navigation. Both set the initial pose to `[0.0, 0.0, 0.0]` and include parameters adapted to the mecanum robot and Gazebo Sim.
 
 When using **Real robot**:
+- Before launching Nav2, physically place the robot at the pose defined as `[0.0, 0.0, 0.0]` when the map was created. Keep the robot stationary and reset its odometry:
+
+  ```shell
+  ros2 topic pub --once /reset_odom std_msgs/msg/Bool "{data: true}"
+  ```
+
+  > Perform the odometry reset before launching Nav2. This makes the initial `odom` pose consistent with the map origin and avoids a discontinuity while the navigation stack is active.
+
 - Launch the navigation stack:
 
   ```shell
@@ -198,6 +206,9 @@ We can create a Python node to interact with the Nav2 topics and actions. To nav
   - For the real robot:
 
     ```shell
+    # Place the robot at the map origin [0.0, 0.0, 0.0] and reset odometry first
+    ros2 topic pub --once /reset_odom std_msgs/msg/Bool "{data: true}"
+
     ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=my_map.yaml params_file:=rubot_real.yaml
     ```
 

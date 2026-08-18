@@ -139,13 +139,13 @@ controller_server:
 
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.04
-      movement_time_allowance: 15.0
+      required_movement_radius: 0.05
+      movement_time_allowance: 60.0
 
     general_goal_checker:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.40
+      xy_goal_tolerance: 0.30
       yaw_goal_tolerance: 0.52  #30deg
 
     FollowPath:
@@ -171,10 +171,10 @@ controller_server:
       decel_lim_theta: -3.0
 
       # Reduced samples to make DWB lighter
-      vx_samples: 10
-      vy_samples: 8
-      vtheta_samples: 16
-      sim_time: 1.5
+      vx_samples: 6
+      vy_samples: 6
+      vtheta_samples: 12
+      sim_time: 0.8
       linear_granularity: 0.05
       angular_granularity: 0.05
       transform_tolerance: 0.3
@@ -184,11 +184,9 @@ controller_server:
       short_circuit_trajectory_evaluation: True
       stateful: True
 
-      critics: ["Oscillation", "BaseObstacle", "PathAlign", "PathDist", "GoalDist", "GoalAlign", "RotateToGoal"]
+      critics: ["Oscillation", "BaseObstacle", "PathDist", "GoalDist", "GoalAlign", "RotateToGoal"]
 
-      BaseObstacle.scale: 0.8
-      PathAlign.scale: 8.0
-      PathAlign.forward_point_distance: 0.20
+      BaseObstacle.scale: 0.18
       PathDist.scale: 4.0
       GoalDist.scale: 16.0
       GoalAlign.scale: 5.0
@@ -260,7 +258,7 @@ local_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 5.0
+        cost_scaling_factor: 3.0
 
       always_send_full_costmap: False
 
@@ -313,7 +311,7 @@ global_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 5.0
+        cost_scaling_factor: 3.0
 
       always_send_full_costmap: False
 
