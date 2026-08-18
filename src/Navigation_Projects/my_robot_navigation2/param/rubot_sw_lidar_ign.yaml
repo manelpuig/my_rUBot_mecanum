@@ -160,12 +160,12 @@ controller_server:
       min_vel_theta: 0.0
       max_vel_theta: 1.6
 
-      trans_stopped_velocity: 0.05
-      rot_stopped_velocity: 0.02
+      trans_stopped_velocity: 0.15
+      rot_stopped_velocity: 0.10
 
       min_speed_xy: 0.0
       max_speed_xy: 0.50
-      min_speed_theta: 0.1
+      min_speed_theta: 0.05
 
       acc_lim_x: 1.8
       acc_lim_y: 1.5
@@ -297,7 +297,7 @@ planner_server:
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
-      tolerance: 1.0
+      tolerance: 0.25
       use_astar: false
       allow_unknown: true
 

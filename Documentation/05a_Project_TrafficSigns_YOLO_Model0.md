@@ -1,4 +1,4 @@
-# Computer Vision Tasks with YOLO
+# Computer Vision tasks with YOLO
 
 In robot perception, four common vision tasks are typically
 used:
@@ -101,7 +101,7 @@ Image from: https://www.dfrobot.com/blog-13844.html
 
 YOLO (You Only Look Once) is a family of real-time object detection models based on deep learning.
 
-We use YOLO because:
+We use Yolo because:
 
 -   it runs in real time
 -   it works well on CPU systems
@@ -166,16 +166,15 @@ and retraining YOLO in detection mode.
 This upgrade allows the robot to detect multiple signs simultaneously
 inside the same image.
 
-## References
-
-- [YOLO](https://www.dfrobot.com/blog-13844.html)
+Bibliography:
+- [Yolo](https://www.dfrobot.com/blog-13844.html)
 - [Ultralytics](https://github.com/ultralytics/ultralytics)
 - [Training model](https://docs.ultralytics.com/es/usage/python/#how-do-i-train-a-custom-yolo-model-using-my-dataset)
 - [Roboflow](https://roboflow.com/)
 
-## Objectives
+## Objectives 
 
-The traffic signs that we want to identify are:
+The signals that we want to identify are:
 - Stop
 - Turn Right
 - Turn Left
@@ -185,21 +184,20 @@ The traffic signs that we want to identify are:
 ![](./Images/07_Yolo/TrafficSigns.png)
 
 ## Installation
-```bash
+````bash
 py -3.11 -m pip install ultralytics
 py -3.11 -m pip uninstall numpy
 py -3.11 -m pip install "numpy<2.0"
 py -3.11 -m pip install pillow
 py -3.11 -m pip install opencv-python
-```
-> Change the Python version to match the version installed on your computer.
+````
+> Chang the python version to agree with the one intalled in your computer
 
-## 1. YOLO Model Generation for a Classification Task
+## **1. YOLO Model generation for Classification task**
 
-For traffic sign classification, we will use the pretrained YOLO11 model.
-- Create the following initial folder structure:
-
-```text
+For Traffic signs classification we will use the YOLO11 model, that is a pre-trained model.
+- You need an initial structure:
+````python
 photos/
 ├── Stop/
 ├── Right/
@@ -207,21 +205,20 @@ photos/
 ├── Give/
 ├── Nothing/
 └── Forbidden/
-```
-- Capture around 200 images of each traffic sign using different positions, lighting conditions, backgrounds, and viewing angles.
+````
+- Now you have to make photos (around 200) for each traffic sign with different positions, ilumination, environment, etc
     - If you want to use your computer webcam: 
-        - Open a terminal in the `/photos/Stop` folder, for example.
-        - Run `1_capture_images.py`.
+        - open terminal in `/photos/Stop` folder, for exemple and
+        - run `1_capture_images.py`
     - If you want to use the rUBot camera: 
-        - Use the ROS 2 node `1_capture_images_from_topic.py` to read images from the `/image_raw` topic and save them in the specified folder.
-        - In a new terminal, run:
-
-        ```bash
+        - Create a ROS2 node to read Images from `/image_raw` topic and save in speciffic folder (1_capture_images_from_topic.py)
+        - In a new terminal execute:
+        ````bash
         py -3.11 1_capture_images_from_topic.py
-        ```
-        - Verify the topic name and change `OUTPUT_RELATIVE_PATH` for each traffic sign.
-- Use `2_prepare_dataset.py` to resize the images to 640 × 640 pixels and create the following dataset structure:
-```text
+        ````
+        - verify the topic name and change OUTPUT_RELATIVE_PATH for each signal
+- First step is to resize to a 640x640 file format in a new structure, with the code `2_prepare_dataset.py`:
+````python
 traffic_sign_dataset/
 ├── train/
 │   ├── Stop/
@@ -237,88 +234,84 @@ traffic_sign_dataset/
     ├── Give/
     ├── Nothing/
     └── Forbidden/
-```
-> `TRAIN_RATIO = 0.80`: 80% of the images are used for training and 20% for validation.
-- Train the classification model with `3_generate_model.py`.
-- The model will be generated at `runs/classify/train/weights/best.pt`.
+````
+> See the value: TRAIN_RATIO = 0.80   # 80% train, 20% val
+- Train a classification model with `3_generate_model.py`
+- the model will be generated in: `runs/classify/train/weights/best.pt`
 - **To test the model prediction** with the classification model `best.pt`:
     - Using your computer webcam:
-        - Verify `MODEL_PATH` in `4_classify_camera.py`, and then run the script.
+        - Verify on `4_classify_camera.py` python code MODEL_PATH and execute it
     - If you want to use the rUBot camera: 
-        - Use the ROS 2 node `4_classify_camera_from_topic.py` to read images from the `/image_raw` topic and classify them in real time using the previously generated model.
-        - In a new terminal, run:
-
-        ```bash
+        - Create a ROS2 node to read Images from `/image_raw` topic and classify in real-time using the previously generated model (4_classify_camera_from_topic.py)
+        - In a new terminal execute:
+        ````bash
         py -3.11 4_classify_camera_from_topic.py
-        ```
-        - Verify the topic name and `MODEL_PATH`.
+        ````
+        - verify the topic name and MODEL_PATH
 
-## 2. YOLO Model Generation for an Identification Task
+## **2. YOLO Model generation for Identification task**
 
-To label the traffic signs in the images and train a model, we will use Roboflow:
-
-- Open [Roboflow](https://roboflow.com/) in a new browser tab.
+To properly label signs in the images and train a model we will use "roboflow":
+- Open a new google tab: https://roboflow.com/
     ![](./Images/07_Yolo/01_roboflow.png)
-- Select **Get Started** or **Sign In**, and then **Continue with Google**.
-- Enter a workspace name, for example `TrafficSignals`.
-- Select the **Public Plan**.
-- You can invite up to four project partners to collaborate on model generation. The suggested role for team members is **Admin**.
-- Create the workspace.
-- Answer the introductory questions.
-- For **What type of model would you like to deploy?**, select **Object Detection**.
+- Select "Get Started" or "Sign In" and "Continue with Google"
+- Select a Name of the workspace (i.e. TrafficSignals)
+- Select "Public Plan"
+- You will have a maximum of 4 invites available for your project partners to collaborate in the model generation. We suggest a role of "Admin" for Invite team members
+- Create a workspace
+- Answer some objective questions
+- Select "What type of model would you like to deploy?". Type "Object Detection"
     ![](./Images/07_Yolo/02_Object_detection1.jpg)
-- See the [Roboflow introductory tutorial](https://blog.roboflow.com/getting-started-with-roboflow/).
+- There is a short Roboflow tutorial video: https://blog.roboflow.com/getting-started-with-roboflow/
 
-- Create a project in the workspace:
-    - Select **Projects**, choose **New Project**, enter a name, and click **Continue with Public**.
+- Create a project in our created "Workspace":
+    - Select Projects and choose ``new project``, choose a name and click on `Continue with Public`
         ![](./Images/07_Yolo/02_Object_detection1.jpg)
-    - Select **Use Traditional Model Builder Instead** to retain full control of the YOLO model for robotics projects.
-    - Create five classes: `Stop`, `Right`, `Left`, `Give`, and `Forbidden`.
-    - Keep one local folder per class containing the images captured previously.
-    - Choose **Select Folder** to upload images from a local folder. Upload all the project images.
+    - Select `Use Traditional Model Builder Instead` to have whole control of YOLO model in Robotic projects
+    - You have 5 different classes: Stop, Right, Left, Give, Forbidden
+    - You will have in your local PC one folder per Class with the different photos you have taken previously.
+    -Choose `Select Folder` to upload pictures from a local folder. Upload all the images on this project.
         ![](./Images/07_Yolo/04_Project2.png)
-    - Select **Save & Continue**, followed by **Start Labeling**.
-    - You can assign images to different invited team members.
-    - Select **Start Annotating** and repeat the process for each class.
+    - Type ``save&continue`` and ``start labeling`` to label all traffic signs pictures
+    - You can assign some pictures to different Invited team members
+    - Select ``start anotating``. You will do it for each Class.
         ![](./Images/07_Yolo/05_Label.png)
-    - If you make an error, open the three-dot menu in **Layers** and change the class.
+    - If you make an error, type ``layers`` 3point menu and change class
         ![](./Images/07_Yolo/06_Label_error.png)
-    - When finished, go back using the arrow in the upper-left corner and select **Add Images to Dataset**.
-    - Select **Use Existing Values**, and then **Add Images**.
-    - Select **Train Model** and **Custom Training**.
-    - Edit **Train/Valid/Test Split**, select **Balance**, and assign 80% to training, 15% to validation, and 5% to testing.
+    - When finished go back (left corner arrow) and select ``add xx images to Dataset``.
+    - Select Method ``use existing values`` and press ``add images``
+    - Select ``train model`` and ``custom training``
+    - Edit ``train test/split`` select ``balance`` (select % of training (80%) / Validating (15%) / Test (5%))
         ![](./Images/07_Yolo/07_train_balance.png)
-    - Select **Continue** for the remaining options.
-    - Under **Augmentation**, select **Shear** to account for variations along the x- and y-axes.
+    - select ``continue`` for the other options
+    - select ``augmentation`` and ``shear`` to proper consider rotations in x and y axis
         ![](./Images/07_Yolo/08_shear.png)
-    - Select **Create**.
-    - Select **Download Dataset**, choose the **YOLOv8** format, and select **Download ZIP to Computer**. The ZIP file contains the training, validation, and test images together with the `data.yaml` file used to obtain the final model.
+    - type ``create``
+    - type ``download Data set`` choose format ``yolov8`` and ``Download zip to computer``. Save this zip file to your computer. This contains images (for train, valid and test) and data.yaml used in the next section to obtain the final model.
 
  <img src="./Images/07_Yolo/09_DataSet.png" width="400"/>  <img src="./Images/07_Yolo/09_DataSet2.png" width="200"/> 
 
 - **To test the model prediction** with the identification model `yolov8n_identification_signals.pt`:
     - Using your computer webcam:
-        - Verify `MODEL_PATH` in `5_identify_camera.py`, and then run the script.
+        - Verify on `5_identify_camera.py` python code the MODEL_PATH and execute it
     - If you want to use the rUBot camera: 
-        - Verify the topic and `MODEL_PATH` in `5_identify_camera_from_topic.py`.
-        - In a new terminal, run:
-
-        ```bash
+        - Verify in `5_identify_camera_from_topic.py` the topic and MODEL_PATH
+        - In a new terminal execute:
+        ````bash
         py -3.11 5_identify_camera_from_topic.py
-        ```
+        ````
 
 
-## 3. Pose Estimation
+## **3. Pose Estimation**
 
 Pose estimation detects **keypoints of articulated bodies**, typically
 humans.
 
-1. Open a terminal in `YOLO_model_generation`.
-2. Run the Python program:
-
-```bash
-py -3.11 6_pose_gesture_camera.py
-```
+- Open a terminal in `YOLO_model_generation`
+- execute the python program:
+    ````pythpn
+    py -3.11 6_pose_gesture_camera.py
+    ````
 
 ![](./Images/07_Yolo/01_Yolo_Pose_Detection.png)
 ![](./Images/07_Yolo/01_Yolo_Pose_Detection2.png)
