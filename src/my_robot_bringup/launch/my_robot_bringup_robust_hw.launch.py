@@ -1,0 +1,181 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
+
+
+def generate_launch_description():
+    # ------------------------------------------------------------------
+    # Global launch arguments
+    # ------------------------------------------------------------------
+    robot_model = LaunchConfiguration('robot_model')
+    mecanum_serial_port = LaunchConfiguration('mecanum_serial_port')
+    rplidar_serial_port = LaunchConfiguration('rplidar_serial_port')
+    rplidar_frame_id = LaunchConfiguration('rplidar_frame_id')
+    camera_width = LaunchConfiguration('camera_width')
+    camera_height = LaunchConfiguration('camera_height')
+    usb_video_device = LaunchConfiguration('usb_video_device')
+    camera_pixel_format = LaunchConfiguration('camera_pixel_format')
+    camera_output_encoding = LaunchConfiguration('camera_output_encoding')
+
+    declare_robot_model = DeclareLaunchArgument(
+        'robot_model',
+        default_value='robot_arm/my_simple_robot.urdf',
+        description='URDF/XACRO path inside my_robot_description/urdf'
+    )
+
+    declare_mecanum_serial_port = DeclareLaunchArgument(
+        'mecanum_serial_port',
+        default_value='/dev/robot_arduino',
+        description='Stable device symlink for Nano mecanum driver'
+    )
+
+    declare_rplidar_serial_port = DeclareLaunchArgument(
+        'rplidar_serial_port',
+        default_value='/dev/robot_lidar',
+        description='Stable device symlink for RPLidar'
+    )
+
+    declare_rplidar_frame_id = DeclareLaunchArgument(
+        'rplidar_frame_id',
+        default_value='laser',
+        description='Frame ID for RPLidar data'
+    )
+
+    declare_camera_width = DeclareLaunchArgument(
+        'camera_width',
+        default_value='640',
+        description='Width of the camera image'
+    )
+
+    declare_camera_height = DeclareLaunchArgument(
+        'camera_height',
+        default_value='480',
+        description='Height of the camera image'
+    )
+
+    declare_usb_video_device = DeclareLaunchArgument(
+        'usb_video_device',
+        default_value='/dev/robot_camera',
+        description='Stable device symlink for USB camera'
+    )
+
+    declare_camera_pixel_format = DeclareLaunchArgument(
+        'camera_pixel_format',
+        default_value='YUYV',
+        description='Pixel format for USB camera'
+    )
+
+    declare_camera_output_encoding = DeclareLaunchArgument(
+        'camera_output_encoding',
+        default_value='rgb8',
+        description='ROS output encoding for USB camera'
+    )
+
+    # ------------------------------------------------------------------
+    # Robot description + state publisher
+    # ------------------------------------------------------------------
+    robot_description_content = Command([
+        'xacro ',
+        PathJoinSubstitution([
+            FindPackageShare('my_robot_description'),
+            'urdf',
+            robot_model,
+        ])
+    ])
+
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_description_content}]
+    )
+
+    # ------------------------------------------------------------------
+    # Hardware sub-launch files
+    # ------------------------------------------------------------------
+    robot_driver_hw_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('my_robot_bringup'),
+                'launch',
+                'robot_driver_hw.launch.py',
+            )
+        ),
+        launch_arguments={'mecanum_serial_port': mecanum_serial_port}.items()
+    )
+
+    usb_cam_hw_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('my_robot_bringup'),
+                'launch',
+                'usb_cam_V4L2_hw.launch.py',
+            )
+        ),
+        launch_arguments={
+            'image_width': camera_width,
+            'image_height': camera_height,
+            'video_device': usb_video_device,
+            'pixel_format': camera_pixel_format,
+            'output_encoding': camera_output_encoding,
+        }.items()
+    )
+
+    rplidar_hw_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('my_robot_bringup'),
+                'launch',
+                'rplidar_hw.launch.py',
+            )
+        ),
+        launch_arguments={
+            'rplidar_serial_port': rplidar_serial_port,
+            'rplidar_frame_id': rplidar_frame_id,
+        }.items()
+    )
+
+    # ------------------------------------------------------------------
+    # Robust boot sequence: wait until all hardware devices are visible and
+    # usable before starting the nodes. Then start them one by one with a
+    # short delay to avoid serial/USB races during real hardware bring-up.
+    # ------------------------------------------------------------------
+    wait_for_devices = ExecuteProcess(
+        cmd=['python3', os.path.join(
+            get_package_share_directory('my_robot_bringup'),
+            'scripts',
+            'wait_for_devices.py'
+        )],
+        output='screen',
+        name='wait_for_robot_devices'
+    )
+
+    # ------------------------------------------------------------------
+    # Build launch description
+    # ------------------------------------------------------------------
+    ld = LaunchDescription()
+
+    ld.add_action(declare_robot_model)
+    ld.add_action(declare_mecanum_serial_port)
+    ld.add_action(declare_rplidar_serial_port)
+    ld.add_action(declare_rplidar_frame_id)
+    ld.add_action(declare_camera_width)
+    ld.add_action(declare_camera_height)
+    ld.add_action(declare_usb_video_device)
+    ld.add_action(declare_camera_pixel_format)
+    ld.add_action(declare_camera_output_encoding)
+
+    ld.add_action(robot_state_publisher_node)
+    ld.add_action(wait_for_devices)
+    ld.add_action(TimerAction(period=2.0, actions=[robot_driver_hw_launch]))
+    ld.add_action(TimerAction(period=4.0, actions=[usb_cam_hw_launch]))
+    ld.add_action(TimerAction(period=6.0, actions=[rplidar_hw_launch]))
+
+    return ld
