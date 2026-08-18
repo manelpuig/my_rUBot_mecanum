@@ -188,14 +188,14 @@ controller_server:
       # path tracking and obstacle clearance as the dominant criteria.
       critics: ["Oscillation", "BaseObstacle", "PathAlign", "PathDist", "GoalDist", "GoalAlign", "RotateToGoal"]
 
-      BaseObstacle.scale: 3.0
-      PathAlign.scale: 4.0
-      PathAlign.forward_point_distance: 0.15
-      PathDist.scale: 24.0
+      BaseObstacle.scale: 8.0
+      PathAlign.scale: 1.0
+      PathAlign.forward_point_distance: 0.10
+      PathDist.scale: 20.0
       GoalDist.scale: 6.0
-      GoalAlign.scale: 2.0
-      GoalAlign.forward_point_distance: 0.15
-      RotateToGoal.scale: 5.0
+      GoalAlign.scale: 0.5
+      GoalAlign.forward_point_distance: 0.10
+      RotateToGoal.scale: 3.0
       RotateToGoal.slowing_factor: 5.0
       RotateToGoal.lookahead_time: -1.0
 
@@ -261,8 +261,8 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.20
-        cost_scaling_factor: 1.5
+        inflation_radius: 0.30
+        cost_scaling_factor: 1.0
 
       always_send_full_costmap: False
 
@@ -314,8 +314,8 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.20
-        cost_scaling_factor: 1.5
+        inflation_radius: 0.40
+        cost_scaling_factor: 1.0
 
       always_send_full_costmap: False
 
