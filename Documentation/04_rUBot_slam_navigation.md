@@ -66,7 +66,7 @@ These three packages are organized in the `src/Navigation_Projects` subfolder wi
   - For the simulated environment:
 
     ```shell
-    ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf x:=0.0 y:=0.0 yaw:=0.0
+    ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=0.0 y:=0.0 yaw:=0.0
     ```
 
     > Change `world` to the name of the world you have created.

@@ -130,7 +130,7 @@ def generate_launch_description():
             "--qz", "0",
             "--qw", "1",
             "--frame-id", "base_scan",
-            "--child-frame-id", "rubot_mecanum/base_link/lidar",
+            "--child-frame-id", "rubot_mecanum/base_footprint/lidar",
         ],
         parameters=[{"use_sim_time": True}],
     )

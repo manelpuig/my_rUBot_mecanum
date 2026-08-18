@@ -208,7 +208,7 @@ def generate_launch_description():
             "--frame-id",
             "base_scan",
             "--child-frame-id",
-            "rubot_mecanum/base_link/lidar",
+            "rubot_mecanum/base_footprint/lidar",
         ],
         parameters=[
             {
