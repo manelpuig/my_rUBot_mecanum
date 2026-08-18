@@ -116,7 +116,7 @@ When using **Gazebo Virtual environment**:
 - Bring up the simulated robot at the same pose used to start mapping:
 
   ```shell
-  ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf x:=0.0 y:=0.0 yaw:=0.0
+  ros2 launch my_robot_bringup my_robot_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf.xacro x:=0.0 y:=0.0 yaw:=0.0
   ```
 
 - Launch the navigation stack. Use only the command corresponding to the sensor configuration in use:
