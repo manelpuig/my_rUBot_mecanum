@@ -1,194 +1,234 @@
-# **4. ROS2 rUBot SLAM Navigation**
+# **4. ROS 2 rUBot SLAM Navigation**
 
-The objectives of this section are:
+The objectives of this section are to:
 
-The interesting documentation is:
-- Udemy (Edouard Renard): https://www.udemy.com/course/ros2-nav2-stack/learn/lecture/35488788#overview
-- https://automaticaddison.com/the-ultimate-guide-to-the-ros-2-navigation-stack/
-- https://github.com/agilexrobotics/limo_ros2_doc/blob/master/LIMO-ROS2-humble(EN).md
-- https://discourse.ros.org/t/ros2-mapping-and-navigation-with-agilex-limo-ros2/37439
-- https://bitbucket.org/theconstructcore/workspace/projects/ROB
-- https://github.com/westonrobot/limo_ros2_docker/tree/humble
-- https://github.com/ROBOTIS-GIT/turtlebot3/tree/main
+- generate a 2D occupancy map while localizing the robot with SLAM;
+- save the generated map;
+- localize the robot on a known map and navigate autonomously with Nav2;
+- send navigation goals programmatically with the Simple Commander API.
 
-SLAM (Simultaneous Localization and Mapping) navigation aims to:
-- simultaneously map an unknown environment and localize the robot within it. 
-- It generates an optimal trajectory to a specified target point and 
-- navigates along this path, continuously updating the map and avoiding obstacles to ensure efficient and autonomous movement.
+Useful documentation:
 
-There are different methods:
-- SLAM gmapping: to create 2D occupancy maps from laser and position data. Ideal for small indoor environments with low scan frequency.
-- Cartographer: Provides real-time SLAM in 2D and 3D, compatible with multiple platforms and sensor configurations. Known for its accuracy and ability to work with multi-sensor data.
-- RTAB-MAP: A library and standalone application for visual and lidar SLAM. Supports various platforms and sensors.
+- [ROS 2 Nav2 Stack course by Edouard Renard](https://www.udemy.com/course/ros2-nav2-stack/learn/lecture/35488788#overview)
+- [The Ultimate Guide to the ROS 2 Navigation Stack](https://automaticaddison.com/the-ultimate-guide-to-the-ros-2-navigation-stack/)
+- [AgileX LIMO ROS 2 Humble documentation](https://github.com/agilexrobotics/limo_ros2_doc/blob/master/LIMO-ROS2-humble(EN).md)
+- [ROS 2 mapping and navigation with AgileX LIMO](https://discourse.ros.org/t/ros2-mapping-and-navigation-with-agilex-limo-ros2/37439)
+- [The Construct Robotics workspaces](https://bitbucket.org/theconstructcore/workspace/projects/ROB)
+- [Weston Robot LIMO ROS 2 Docker](https://github.com/westonrobot/limo_ros2_docker/tree/humble)
+- [TurtleBot3 repository](https://github.com/ROBOTIS-GIT/turtlebot3/tree/main)
 
-## **4.1. SLAM-Navigation install**
+SLAM (Simultaneous Localization and Mapping) simultaneously creates a map of an unknown environment and estimates the robot pose within it.
 
-You need first to install the needed packages (already installed in TheConstruct environment and also in our custom SSD environment):
+Once the map has been generated, Nav2 uses it to localize the robot, plan a path to a target pose and execute that path while avoiding obstacles. Therefore, SLAM is responsible for mapping and localization, whereas Nav2 is responsible for autonomous navigation.
+
+There are different SLAM methods available in ROS 2:
+
+- SLAM Toolbox: creates 2D occupancy maps from laser scans and odometry and is widely used with Nav2 in indoor environments.
+- Cartographer: provides real-time SLAM in 2D and 3D and supports multiple platforms and sensor configurations.
+- RTAB-Map: provides visual, RGB-D and lidar SLAM and supports a wide range of platforms and sensors.
+
+> `gmapping` is commonly used in ROS 1. For ROS 2 Humble, SLAM Toolbox is the usual 2D alternative.
+
+## **4.1. SLAM and Navigation installation**
+
+First, install the required packages. They are already installed in The Construct environment and in our custom SSD environment:
+
 ```shell
 sudo apt update
-sudo apt install ros-humble-cartographer 
+sudo apt install ros-humble-cartographer
 sudo apt install ros-humble-cartographer-ros
 sudo apt install ros-humble-navigation2 ros-humble-nav2-bringup
 sudo apt install ros-humble-nav2-simple-commander
 sudo apt install ros-humble-tf-transformations
 ```
-We have constructed speciffic packages taking the template of equivalent Turtlebot3 project (waffle model):
-- my_robot_cartographer
-- my_robot_navigation2
 
-A new `my_robot_nav_control` package is created for new navigation control projects using Simple Commander API. 
+We have created specific packages based on the equivalent TurtleBot3 project (Waffle model):
 
-This new `my_robot_nav_control` package is created with:
-````shell
+- `my_robot_cartographer`
+- `my_robot_navigation2`
+
+The `my_robot_nav_control` package provides navigation control projects based on the Simple Commander API. It was created with:
+
+```shell
 ros2 pkg create --build-type ament_python my_robot_nav_control --dependencies rclpy std_msgs sensor_msgs geometry_msgs nav_msgs nav2_simple_commander tf_transformations
-cd ..
-colcon build
-````
-These 3 packages are organized inside a `Navigation_Projects` subfolder on src folder with the structure:
-- Navigation_Projects
-    - my_robot_cartographer
-    - my_robot_navigation2
-    - my_robot_nav_control
+```
+
+These three packages are organized in the `src/Navigation_Projects` subfolder with the following structure:
+
+- `Navigation_Projects`
+  - `my_robot_cartographer`
+  - `my_robot_navigation2`
+  - `my_robot_nav_control`
 
 ## **4.2. Generate a Map with SLAM**
 
-- Fist of all you have to bringup the robot in the desired environment at the desired initial position (0,0,0):
-    - In the case of Virtual environment:
-        ````shell
-        ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
-        ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_ign.world
-        ````
-        >Change the custom_world with the world name you have created
-    - In the case of a real robot the bringup is already made when turned on the robot.
-      
-- to generate the map:
-    - In the case of Virtual environment:
-        ````shell
-        ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=true
-        ````
-    >use_sim_time:=true when using Gazebo for Virtual simulation. Is true by default in cartographer.launch.py file
-    - In the case of real robot, we have first to initialize the robot POSE on the real map to zero-pose to be used as `origin` in the map file:
-        ````shell
-        ros2 topic pub --once /reset_odom std_msgs/msg/Bool "{data: true}"
-        ````
-    - Later we can launch cartographer with:
-        ````shell
-        ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=false
-        ````
-- Navigate on the world to store the map
-    ````shell
-    ros2 run teleop_twist_keyboard teleop_twist_keyboard
-    ````
-- Save the map in my_robot_navigation2/map folder with:
-    ````shell
-    cd src/Navigation_Projects/my_robot_navigation2/map/
-    ros2 run nav2_map_server map_saver_cli -f my_map
-    ````
-- To verify and see the created map you can install and use `imagemagick` package:
-    ````shell
-    sudo apt update
-    sudo apt install imagemagick
-    display my_map.pgm
-    ````
+- First, bring up the robot in the desired environment at the initial pose `[0.0, 0.0, 0.0]`:
+  - For the simulated environment:
 
-## **4.3. Navigate inside Map**
+    ```shell
+    ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf x:=0.0 y:=0.0 yaw:=0.0
+    ```
 
-- Let`s now make the robot navigate using the Map:
-    - In the case of Virtual environment:
-        ````shell
-        ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=robot_arm/my_simple_robot.urdf custom_world:=square4m_sign.world
-        ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_ign.world
-        ````
-        >Change the URDF file for each robot
-        - Launch Navigation node: python launcher is more powerfull than previous xml format
-        ````bash
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=map_square4m_sign.yaml params_file:=rubot_sw.yaml 
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py  use_sim_time:=true map_file:=map_square_sign_ign.yaml params_file:=rubot_sw_lidar_ign.yaml
-        ````
-        >An optimized set of Navigation parameters is set on rubot_sw_lidar.yaml:
-        >    - Initial Pose is set
-        >    - lidar data is priorized from odometry for robot localization
-        >    - Cost map Resolution and computational cost is minimized
-    - In the case of real robot:
-        ````shell
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=my_map.yaml params_file:=rubot_real.yaml
-        ````
+    > Change `world` to the name of the world you have created.
 
-- If Initial Pose is not set, localize the robot on the map using "2D-Pose estimate". The "Global Planner" and "Controller" will be updated and NO errors will appear
-- Navigate on the MAP with Nav2
-    - Selecty 1 target point
-    - Select multiple waypoints with "Waypoint/Nav through Poses Mode" option:
-        - Select different `Nav2 Goal` points in RVIZ2
-        - Choose `Start Waypoint Following` option to follow the exact `Nav2 Goal` selected points
-        - Choose `Start Nav Through Poses` option to follow an optimized unique trajectory following the different `Nav2 Goal` selected points 
+  - For the real robot, the bringup is already running when the robot is turned on.
+
+- Generate the map:
+  - For the simulated environment:
+
+    ```shell
+    ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=true
+    ```
+
+    > Use `use_sim_time:=true` with Gazebo Sim. It is enabled by default in `cartographer.launch.py`.
+
+  - For the real robot, first reset its odometry at the pose that will be used as the map origin, and then launch Cartographer:
+
+    ```shell
+    ros2 topic pub --once /reset_odom std_msgs/msg/Bool "{data: true}"
+    
+    ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=false
+    ```
+
+- Drive the robot around the environment to generate the map:
+
+  ```shell
+  ros2 run teleop_twist_keyboard teleop_twist_keyboard
+  ```
+
+- Save the map in the `my_robot_navigation2/map` folder:
+
+  ```shell
+  cd src/Navigation_Projects/my_robot_navigation2/map/
+  ros2 run nav2_map_server map_saver_cli -f my_map
+  ```
+
+- To inspect the generated map, install and use ImageMagick:
+
+  ```shell
+  sudo apt update
+  sudo apt install imagemagick
+  display my_map.pgm
+  ```
+
+## **4.3. Navigate inside the Map**
+When using **Gazebo Virtual environment**:
+- Bring up the simulated robot at the same pose used to start mapping:
+
+  ```shell
+  ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf x:=0.0 y:=0.0 yaw:=0.0
+  ```
+
+- Launch the navigation stack. Use only the command corresponding to the sensor configuration in use:
+
+  ```shell
+  # General Gazebo Sim configuration
+  ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=true map_file:=map_square_sign_ign.yaml params_file:=rubot_sw_ign.yaml
+
+  # Gazebo Sim configuration optimized for lidar navigation
+  ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=true map_file:=map_square_sign_ign.yaml params_file:=rubot_sw_lidar_ign.yaml
+  ```
+
+  `rubot_sw_ign.yaml` is the general Gazebo Sim configuration, whereas `rubot_sw_lidar_ign.yaml` contains the configuration optimized specifically for lidar navigation. Both set the initial pose to `[0.0, 0.0, 0.0]` and include parameters adapted to the mecanum robot and Gazebo Sim.
+
+When using **Real robot**:
+- Launch the navigation stack:
+
+  ```shell
+  ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=my_map.yaml params_file:=rubot_real.yaml
+  ```
+
+- If the initial pose is not configured, localize the robot on the map using **2D Pose Estimate** in RViz. The global planner and controller can then start operating correctly.
+- Navigate on the map with Nav2:
+  - Select one target pose.
+  - Select multiple waypoints with the **Waypoint/Nav Through Poses Mode** option:
+    - Select different **Nav2 Goal** poses in RViz.
+    - Choose **Start Waypoint Following** to visit the selected poses individually.
+    - Choose **Start Nav Through Poses** to calculate a single optimized trajectory through the selected poses.
 
 ## **4.4. Interact Programmatically with Nav2**
 
-You will use Simple Commander API to interact with Topics subscribers, Service clients and Action clients.
+The Simple Commander API provides a Python interface to Nav2 topics, services and actions.
 
-The interesting topics used:
-- /initialpose (geometry_msgs)
+Relevant topics:
 
-The interesting actions used:
-- /navigate_to_pose
-- /follow_waypoints
+- `/initialpose` (`geometry_msgs/msg/PoseWithCovarianceStamped`)
 
-Main Class: 
-- BasicNavigator()
+Relevant actions:
 
-Main functions:
+- `/navigate_to_pose`
+- `/follow_waypoints`
+
+Main class:
+
+- `BasicNavigator()`
+
+Main methods:
+
 - `.setInitialPose(pose)`
 - `.waitUntilNav2Active()`
 - `.followWaypoints(pose_list)`
 - `.goToPose(pose)`
 
-we need to install (already installed in our SSD custom environment):
-````shell
+Install the following packages if they are not already available in the custom SSD environment:
+
+```shell
 sudo apt install ros-humble-nav2-simple-commander
 sudo apt install ros-humble-tf-transformations
-````
-We can create a python file to interact with topics and actions.
+```
 
-To navigate programmatically using Simple Commander API, you have to proceed with:
-- Bringup the robot in the desired environment:
-    - In the case of Virtual environment:
-        ````shell
-        ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=robot_arm/my_simple_robot.urdf  custom_world:=square4m_sign.world
-        ````
-    - In the case of a real robot, the bringup is already made when turned on
-- Start the navigation2.launch.py with rviz to see the evolution of robot navigation
-    - In the case of Virtual environment:
-        ````shell
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=true map_file:=map_square4m_sign.yaml params_file:=rubot_sw.yaml
-        ````
-        - In the case of real robot:
-        ````shell
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=map_project.yaml params_file:=rubot_real.yaml
-        ````
-        > Here is important to specify `use_sim_time:=false` for real robot. In `navigation2_robot.launch.py` file is set to true by default.
+We can create a Python node to interact with the Nav2 topics and actions. To navigate programmatically with the Simple Commander API:
 
-- Launch the created python file to define the Initial point and some targets waypoints defined in config folder:
-    ````
-    ros2 launch my_robot_nav_control nav_waypoints.launch.py wp_file:=waypoints_sw.yaml
-    ````
-- The params are described in `waypoints_sw.yaml` file in config folder:
-    ````yaml
-    initial_pose: [0.0, 0.0, 0.0]
-    waypoints:
-        - [1.0, -1.0, 0.0]
-        - [2.0, 0.0, 1.57]
-    final_pose: [2.0, 1.0, 1.57]
+- Bring up the robot in the desired environment:
+  - For the simulated environment:
 
-    ````
-    > If waypoints list is empty `waypoints: []` the robot will navigate only from initial_pose to final_pose
-    
-    > wp_file could be send as ROS parameter file (waypoints_sw1.yaml):
-    ````yaml
-    nav_waypoints_node:
-        ros__parameters:
-            initial_pose: [0.0,0.0,0.0]
-            waypoints: # waypoints: [] creates an empty list and goes to final_pose directly
-                - [1.5,0.5,0.3]
-                - [3.4,0.5,-0.5]
-            final_pose: [4.7,0.5,1.57]
-    ````
+    ```shell
+    ros2 launch my_robot_bringup my_robot_arm_bringup_gz.launch.py world:=square_sign_left_ign.world robot_model:=rubot/rubot_mecanum.urdf x:=0.0 y:=0.0 yaw:=0.0
+    ```
+
+  - For the real robot, the bringup is already running when the robot is turned on.
+
+- Start `navigation2_robot.launch.py` with RViz to monitor the robot navigation:
+  - For the simulated environment:
+
+    ```shell
+    ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=true map_file:=map_square_sign_ign.yaml params_file:=rubot_sw_ign.yaml
+    ```
+
+  - For the real robot:
+
+    ```shell
+    ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=my_map.yaml params_file:=rubot_real.yaml
+    ```
+
+    > It is important to specify `use_sim_time:=false` for the real robot because it is set to `true` by default in `navigation2_robot.launch.py`.
+
+- Launch the Python node using the initial pose and target waypoints defined in the `config` folder:
+
+  ```shell
+  ros2 launch my_robot_nav_control nav_waypoints.launch.py wp_file:=waypoints_sw_ign.yaml
+  ```
+
+- The parameters are defined in `waypoints_sw_ign.yaml`. Each pose uses the format `[x, y, yaw]`, expressed in the `map` frame, with `yaw` in radians:
+
+  ```yaml
+  initial_pose: [0.0, 0.0, 0.0]
+  waypoints:
+    - [1.0, -1.0, 0.0]
+    - [2.0, 0.0, 1.57]
+  final_pose: [2.0, 1.0, 1.57]
+  ```
+
+  > If the waypoint list is empty (`waypoints: []`), the robot will navigate directly from `initial_pose` to `final_pose`.
+
+  In the future, `wp_file` could use the standard ROS parameter-file structure shown below. The current `nav_waypoints.py` implementation does not yet support this format and expects the flat structure shown above:
+
+  ```yaml
+  nav_waypoints_node:
+    ros__parameters:
+      initial_pose: [0.0, 0.0, 0.0]
+      waypoints:
+        - [1.5, 0.5, 0.3]
+        - [3.4, 0.5, -0.5]
+      final_pose: [4.7, 0.5, 1.57]
+  ```
