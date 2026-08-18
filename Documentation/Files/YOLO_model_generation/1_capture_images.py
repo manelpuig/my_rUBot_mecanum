@@ -1,6 +1,6 @@
 import cv2
 import time
-import os
+from pathlib import Path
 
 # ==============================
 # PARAMETERS (EDIT THESE)
@@ -15,14 +15,15 @@ camera_index = 0          # usually 0 for default webcam
 # CAMERA INITIALIZATION
 # ==============================
 
+output_dir = Path.cwd().resolve()
 cap = cv2.VideoCapture(camera_index)
 
 if not cap.isOpened():
-    print("Error: Camera not accessible")
-    exit()
+    raise SystemExit(f"Error: camera {camera_index} is not accessible")
 
 print("Camera started successfully")
-print("Saving images in:", os.getcwd())
+print(f"Saving images in: {output_dir}")
+print("Press Ctrl+C to stop")
 
 counter = start_index
 
@@ -34,9 +35,12 @@ try:
             print("Error capturing image")
             break
 
-        filename = f"{filename_prefix}_{counter}.jpg"
+        filename = output_dir / f"{filename_prefix}_{counter}.jpg"
 
-        cv2.imwrite(filename, frame)
+        if not cv2.imwrite(str(filename), frame):
+            print(f"Error: could not save image: {filename}")
+            break
+
         print(f"Saved: {filename}")
 
         counter += 1
@@ -45,5 +49,7 @@ try:
 except KeyboardInterrupt:
     print("\nCapture stopped by user")
 
-cap.release()
-print("Camera released")
+finally:
+    cap.release()
+    cv2.destroyAllWindows()
+    print("Camera released")

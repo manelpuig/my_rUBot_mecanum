@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 import cv2
 import time
-import sys
+from pathlib import Path
 
 import rclpy
 from rclpy.node import Node
@@ -12,7 +12,8 @@ from cv_bridge import CvBridge
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "runs/classify/train/weights/best.pt"
+SCRIPT_DIR = Path(__file__).resolve().parent
+MODEL_PATH = SCRIPT_DIR / "runs" / "classify" / "train" / "weights" / "best.pt"
 IMAGE_TOPIC = "/image_raw"
 IMG_SIZE = 640
 CONF_THRESHOLD = 0.25
@@ -24,7 +25,7 @@ class YoloClassificationNode(Node):
     def __init__(self):
         super().__init__("yolo_classification_camera_node")
 
-        self.model = YOLO(MODEL_PATH)
+        self.model = YOLO(str(MODEL_PATH))
         self.bridge = CvBridge()
 
         self.subscription = self.create_subscription(
@@ -122,6 +123,9 @@ class YoloClassificationNode(Node):
 
 
 def main(args=None):
+    if not MODEL_PATH.is_file():
+        raise SystemExit(f"Error: classification model not found: {MODEL_PATH}")
+
     rclpy.init(args=args)
 
     node = YoloClassificationNode()

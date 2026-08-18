@@ -2,11 +2,13 @@ from ultralytics import YOLO
 import cv2
 import time
 import sys
+from pathlib import Path
 
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "models/yolov8n_identification_signals.pt" #"models/yolo11n_classification_signals.pt" #"runs/classify/train/weights/best.pt"
+SCRIPT_DIR = Path(__file__).resolve().parent
+MODEL_PATH = SCRIPT_DIR / "runs" / "classify" / "train" / "weights" / "best.pt"
 CAMERA_INDEX = 0
 
 # Resolution used during training
@@ -25,7 +27,11 @@ WINDOW_NAME = "YOLO Classification - Camera"
 # ==============================
 # LOAD MODEL
 # ==============================
-model = YOLO(MODEL_PATH)
+if not MODEL_PATH.is_file():
+    raise SystemExit(f"Error: classification model not found: {MODEL_PATH}")
+
+model = YOLO(str(MODEL_PATH))
+print(f"Using model: {MODEL_PATH}")
 
 # ==============================
 # OPEN CAMERA

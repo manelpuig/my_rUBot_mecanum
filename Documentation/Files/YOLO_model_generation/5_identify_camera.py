@@ -2,12 +2,13 @@ from ultralytics import YOLO
 import cv2
 import time
 import sys
-import os
+from pathlib import Path
 
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "models/yolov8n_custom.pt"
+SCRIPT_DIR = Path(__file__).resolve().parent
+MODEL_PATH = SCRIPT_DIR / "TrainingRoboFlow" / "Traffic_signals_best.pt"
 
 CAMERA_INDEX = 0
 WINDOW_NAME = "YOLO Traffic Sign Detection"
@@ -20,16 +21,17 @@ DISPLAY_SCALE = 5   # Only affects visualization size
 # ==============================
 # CHECK MODEL
 # ==============================
-if not os.path.exists(MODEL_PATH):
+if not MODEL_PATH.is_file():
     print(f"Error: model not found: {MODEL_PATH}")
     sys.exit(1)
 
 # ==============================
 # LOAD MODEL
 # ==============================
-model = YOLO(MODEL_PATH)
+model = YOLO(str(MODEL_PATH))
 
 print("Model loaded correctly")
+print(f"Model path: {MODEL_PATH}")
 print("Model task:", model.task)
 print("Model classes:")
 print(model.names)

@@ -1,14 +1,13 @@
 from pathlib import Path
 import shutil
 import random
-from PIL import Image, ImageOps
+from PIL import Image
 
 # ============================================================
 # Configuration
 # ============================================================
-SCRIPT_DIR = Path(__file__).resolve().parent
-RAW_DATASET_DIR = SCRIPT_DIR / "photos"
-OUTPUT_DATASET_DIR = SCRIPT_DIR / "traffic_sign_dataset"
+RAW_DATASET_DIR = Path("photos")
+OUTPUT_DATASET_DIR = Path("traffic_sign_dataset")
 
 CLASSES = [
     "Stop",
@@ -21,7 +20,6 @@ CLASSES = [
 
 TRAIN_RATIO = 0.80
 IMG_SIZE = 640
-PADDING_COLOR = (114, 114, 114)
 
 VALID_EXTENSIONS = [".jpg", ".jpeg", ".png", ".bmp", ".webp"]
 
@@ -30,17 +28,11 @@ random.seed(42)
 
 def resize_and_save_image(src_path: Path, dst_path: Path, size: int = 640):
     """
-    Resize an image proportionally, pad it to size x size, and save it as JPG.
+    Resize image to size x size and save it as JPG.
     """
     with Image.open(src_path) as img:
         img = img.convert("RGB")
-        img = ImageOps.pad(
-            img,
-            (size, size),
-            method=Image.Resampling.LANCZOS,
-            color=PADDING_COLOR,
-            centering=(0.5, 0.5),
-        )
+        img = img.resize((size, size))
         img.save(dst_path, quality=95)
 
 

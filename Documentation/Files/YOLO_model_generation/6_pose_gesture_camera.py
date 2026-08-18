@@ -2,11 +2,13 @@ from ultralytics import YOLO
 import cv2
 import time
 import sys
+from pathlib import Path
 
 # ==============================
 # PARAMETERS
 # ==============================
-MODEL_PATH = "yolo11n-pose.pt"
+SCRIPT_DIR = Path(__file__).resolve().parent
+MODEL_PATH = SCRIPT_DIR / "yolo11n-pose.pt"
 CAMERA_INDEX = 0
 IMG_SIZE = 640
 CONF_THRESHOLD = 0.35
@@ -68,7 +70,11 @@ def draw_left_info_panel(frame, lines):
 # ==============================
 # LOAD MODEL
 # ==============================
-model = YOLO(MODEL_PATH)
+if not MODEL_PATH.is_file():
+    raise SystemExit(f"Error: pose model not found: {MODEL_PATH}")
+
+model = YOLO(str(MODEL_PATH))
+print(f"Using model: {MODEL_PATH}")
 
 # ==============================
 # OPEN CAMERA

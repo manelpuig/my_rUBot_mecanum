@@ -1,31 +1,16 @@
-from pathlib import Path
-
 from ultralytics import YOLO
-
-SCRIPT_DIR = Path(__file__).resolve().parent
-MODEL_PATH = SCRIPT_DIR / "yolo11n-cls.pt"
-DATASET_DIR = SCRIPT_DIR / "traffic_sign_dataset"
-OUTPUT_DIR = SCRIPT_DIR / "runs" / "classify"
 
 
 def main():
-    train_dir = DATASET_DIR / "train"
-    val_dir = DATASET_DIR / "val"
 
-    if not train_dir.is_dir() or not val_dir.is_dir():
-        raise SystemExit(
-            "Error: classification dataset not found. "
-            f"Expected directories: {train_dir} and {val_dir}"
-        )
+    print("Loading model...")
 
-    print(f"Loading model: {MODEL_PATH}")
-
-    model = YOLO(str(MODEL_PATH))
+    model = YOLO("yolo11n-cls.pt")
 
     print("Starting training...")
 
     model.train(
-        data=str(DATASET_DIR),          # Folder with train/val class subfolders
+        data="traffic_sign_dataset",   # Folder with train/val class subfolders
         epochs=50,                     # Maximum number of training epochs
         imgsz=640,                     # Input image size used during training
         batch=8,                       # Number of images processed per training step
@@ -58,7 +43,7 @@ def main():
         seed=42,                       # Makes training more reproducible
 
         workers=0,                     # Safer on Windows; use 2 or 4 on Linux
-        project=str(OUTPUT_DIR),        # Output folder
+        project="runs/classify",       # Output folder
         name="train",                  # Experiment name
         exist_ok=True,                 # Overwrite/reuse folder if it already exists
 
@@ -67,9 +52,7 @@ def main():
         verbose=True                   # Show training information
     )
 
-    best_model = OUTPUT_DIR / "train" / "weights" / "best.pt"
     print("Training finished.")
-    print(f"Best model: {best_model}")
 
 
 if __name__ == "__main__":

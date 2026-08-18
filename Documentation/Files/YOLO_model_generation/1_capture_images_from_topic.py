@@ -1,5 +1,5 @@
-import os
 import time
+from pathlib import Path
 import cv2
 
 import rclpy
@@ -19,6 +19,25 @@ START_INDEX = 1
 # Relative to the project root directory 
 OUTPUT_RELATIVE_PATH = "photos/Forbidden"
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+VALID_CLASSES = {"Stop", "Right", "Left", "Give", "Nothing", "Forbidden"}
+
+
+def get_output_path() -> Path:
+    relative_path = Path(OUTPUT_RELATIVE_PATH)
+
+    if relative_path.is_absolute():
+        raise ValueError("OUTPUT_RELATIVE_PATH must be relative to the script directory")
+
+    if len(relative_path.parts) != 2 or relative_path.parts[0] != "photos":
+        raise ValueError("OUTPUT_RELATIVE_PATH must use the format 'photos/ClassName'")
+
+    if relative_path.parts[1] not in VALID_CLASSES:
+        valid_names = ", ".join(sorted(VALID_CLASSES))
+        raise ValueError(f"Unknown class '{relative_path.parts[1]}'. Valid classes: {valid_names}")
+
+    return SCRIPT_DIR / relative_path
+
 
 class ImageCaptureNode(Node):
     def __init__(self):
@@ -32,11 +51,9 @@ class ImageCaptureNode(Node):
         self.last_capture_time = 0.0
         self.bridge = CvBridge()
 
-        # Project root = current working directory when ros2 run is executed
-        self.project_root = os.getcwd()
-        self.output_path = os.path.join(self.project_root, OUTPUT_RELATIVE_PATH)
+        self.output_path = get_output_path()
 
-        os.makedirs(self.output_path, exist_ok=True)
+        self.output_path.mkdir(parents=True, exist_ok=True)
 
         self.subscription = self.create_subscription(
             Image,
@@ -46,7 +63,6 @@ class ImageCaptureNode(Node):
         )
 
         self.get_logger().info(f"Subscribed to topic: {self.image_topic}")
-        self.get_logger().info(f"Project root: {self.project_root}")
         self.get_logger().info(f"Saving images in: {self.output_path}")
         self.get_logger().info("Press Ctrl+C to stop")
 
@@ -63,9 +79,9 @@ class ImageCaptureNode(Node):
             return
 
         filename = f"{self.filename_prefix}_{self.counter}.jpg"
-        filepath = os.path.join(self.output_path, filename)
+        filepath = self.output_path / filename
 
-        success = cv2.imwrite(filepath, frame)
+        success = cv2.imwrite(str(filepath), frame)
 
         if success:
             self.get_logger().info(f"Saved: {filepath}")
