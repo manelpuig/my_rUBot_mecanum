@@ -154,13 +154,13 @@ controller_server:
 
       # Mecanum base: allow backward and lateral motion
       min_vel_x: -0.20
-      max_vel_x: 0.35
-      min_vel_y: -0.20
-      max_vel_y: 0.2
+      max_vel_x: 0.45
+      min_vel_y: -0.25
+      max_vel_y: 0.25
       max_vel_theta: 1.6
 
       min_speed_xy: 0.0
-      max_speed_xy: 0.40
+      max_speed_xy: 0.50
       min_speed_theta: 0.10
 
       acc_lim_x: 2.0
@@ -207,8 +207,8 @@ velocity_smoother:
     scale_velocities: False
     feedback: "OPEN_LOOP"
 
-    max_velocity: [0.35, 0.20, 1.6]
-    min_velocity: [-0.20, -0.20, -1.6]
+    max_velocity: [0.45, 0.25, 1.6]
+    min_velocity: [-0.20, -0.25, -1.6]
 
     max_accel: [2.0, 2.0, 4.0]
     max_decel: [-2.0, -2.0, -4.0]
@@ -261,7 +261,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.30
+        inflation_radius: 0.25
         cost_scaling_factor: 1.0
 
       always_send_full_costmap: False
@@ -314,7 +314,7 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.40
+        inflation_radius: 0.32
         cost_scaling_factor: 1.0
 
       always_send_full_costmap: False

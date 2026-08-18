@@ -110,11 +110,11 @@ velocity_smoother:
     enable_stamped_cmd_vel: false
     feedback: "OPEN_LOOP"
 
-    max_velocity: [0.4, 0.15, 1.6]
-    min_velocity: [-0.2, -0.15, -1.6]
+    max_velocity: [0.45, 0.25, 1.6]
+    min_velocity: [-0.2, -0.25, -1.6]
 
-    max_accel: [1.5, 1.0, 3.0]
-    max_decel: [-1.5, -1.0, -3.0]
+    max_accel: [1.8, 1.5, 3.0]
+    max_decel: [-1.8, -1.5, -3.0]
 
     deadband_velocity: [0.005, 0.005, 0.005]
 
@@ -154,9 +154,9 @@ controller_server:
       debug_trajectory_details: False
 
       min_vel_x: -0.2
-      max_vel_x: 0.4
-      min_vel_y: -0.15
-      max_vel_y: 0.15
+      max_vel_x: 0.45
+      min_vel_y: -0.25
+      max_vel_y: 0.25
       min_vel_theta: 0.0
       max_vel_theta: 1.6
 
@@ -164,14 +164,14 @@ controller_server:
       rot_stopped_velocity: 0.02
 
       min_speed_xy: 0.0
-      max_speed_xy: 0.4
+      max_speed_xy: 0.50
       min_speed_theta: 0.1
 
-      acc_lim_x: 1.5
-      acc_lim_y: 1.0
+      acc_lim_x: 1.8
+      acc_lim_y: 1.5
       acc_lim_theta: 3.0
-      decel_lim_x: -1.5
-      decel_lim_y: -1.0
+      decel_lim_x: -1.8
+      decel_lim_y: -1.5
       decel_lim_theta: -3.0
 
       vx_samples: 8
@@ -246,7 +246,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        inflation_radius: 0.30
+        inflation_radius: 0.25
         cost_scaling_factor: 1.0
 
       always_send_full_costmap: True
@@ -272,7 +272,7 @@ global_costmap:
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 0.40
+        inflation_radius: 0.32
         cost_scaling_factor: 1.0
 
       always_send_full_costmap: True
