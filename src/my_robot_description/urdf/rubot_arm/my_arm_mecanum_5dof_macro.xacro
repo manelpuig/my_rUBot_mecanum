@@ -470,6 +470,7 @@
     <ros2_control name="${prefix}MecanumArmSystem" type="system">
       <hardware>
         <plugin>${hardware_plugin}</plugin>
+        <param name="position_proportional_gain">0.1</param>
       </hardware>
 
       <joint name="${prefix}joint1">
