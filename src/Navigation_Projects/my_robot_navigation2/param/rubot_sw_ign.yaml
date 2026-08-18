@@ -184,16 +184,18 @@ controller_server:
       short_circuit_trajectory_evaluation: True
       stateful: True
 
+      # Holonomic base: prefer forward alignment on easy paths, but keep
+      # path tracking and obstacle clearance as the dominant criteria.
       critics: ["Oscillation", "BaseObstacle", "PathAlign", "PathDist", "GoalDist", "GoalAlign", "RotateToGoal"]
 
-      BaseObstacle.scale: 1.0
-      PathAlign.scale: 16.0
-      PathAlign.forward_point_distance: 0.20
-      PathDist.scale: 16.0
-      GoalDist.scale: 8.0
-      GoalAlign.scale: 5.0
-      GoalAlign.forward_point_distance: 0.12
-      RotateToGoal.scale: 10.0
+      BaseObstacle.scale: 3.0
+      PathAlign.scale: 4.0
+      PathAlign.forward_point_distance: 0.15
+      PathDist.scale: 24.0
+      GoalDist.scale: 6.0
+      GoalAlign.scale: 2.0
+      GoalAlign.forward_point_distance: 0.15
+      RotateToGoal.scale: 5.0
       RotateToGoal.slowing_factor: 5.0
       RotateToGoal.lookahead_time: -1.0
 
@@ -260,7 +262,7 @@ local_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 3.0
+        cost_scaling_factor: 1.5
 
       always_send_full_costmap: False
 
@@ -313,7 +315,7 @@ global_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 3.0
+        cost_scaling_factor: 1.5
 
       always_send_full_costmap: False
 
