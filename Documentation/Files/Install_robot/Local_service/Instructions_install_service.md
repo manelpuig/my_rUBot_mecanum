@@ -15,8 +15,8 @@ This guide explains how to:
 ### 🔧 Run the installation script:
 
 ```bash
-chmod +x install_ros2_humble_code&manelpuig_project.sh
-./install_ros2_humble_code&manelpuig_project.sh
+chmod +x install_ros2_humble_rubot.sh
+./install_ros2_humble_rubot.sh
 ````
 This script will:
 
