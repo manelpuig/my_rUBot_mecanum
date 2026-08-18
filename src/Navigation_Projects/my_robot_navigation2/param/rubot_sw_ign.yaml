@@ -126,7 +126,7 @@ controller_server:
     current_goal_checker: "general_goal_checker"
 
     # Lower frequency for lighter simulation
-    controller_frequency: 3.0
+    controller_frequency: 4.0
 
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.001
@@ -145,8 +145,8 @@ controller_server:
     general_goal_checker:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.40
-      yaw_goal_tolerance: 0.78  # Approximately 45 degrees
+      xy_goal_tolerance: 0.30
+      yaw_goal_tolerance: 0.52  # Approximately 30 degrees
 
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
@@ -179,16 +179,18 @@ controller_server:
       angular_granularity: 0.05
       transform_tolerance: 0.3
 
-      xy_goal_tolerance: 0.35
+      xy_goal_tolerance: 0.30
       trans_stopped_velocity: 0.30
       short_circuit_trajectory_evaluation: True
       stateful: True
 
-      critics: ["Oscillation", "BaseObstacle", "PathDist", "GoalDist", "GoalAlign", "RotateToGoal"]
+      critics: ["Oscillation", "BaseObstacle", "PathAlign", "PathDist", "GoalDist", "GoalAlign", "RotateToGoal"]
 
-      BaseObstacle.scale: 0.4
-      PathDist.scale: 4.0
-      GoalDist.scale: 16.0
+      BaseObstacle.scale: 1.0
+      PathAlign.scale: 16.0
+      PathAlign.forward_point_distance: 0.20
+      PathDist.scale: 16.0
+      GoalDist.scale: 8.0
       GoalAlign.scale: 5.0
       GoalAlign.forward_point_distance: 0.12
       RotateToGoal.scale: 10.0
@@ -258,7 +260,7 @@ local_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 5.0
+        cost_scaling_factor: 3.0
 
       always_send_full_costmap: False
 
@@ -311,7 +313,7 @@ global_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         inflation_radius: 0.20
-        cost_scaling_factor: 5.0
+        cost_scaling_factor: 3.0
 
       always_send_full_costmap: False
 
