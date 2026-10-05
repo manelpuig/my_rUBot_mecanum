@@ -90,8 +90,9 @@ In the case of **TheConstruct interface** environment:
     z:=0.0 \
     yaw:=0.0
   ```
+
   ![](./Images/01_Setup/bringup_gz.png)
-  
+
 - Open in a new terminal `rviz2` and read the robot model and available topics:
 ![](./Images/01_Setup/Bringup_rviz2.png)
 
