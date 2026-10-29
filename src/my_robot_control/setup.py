@@ -31,6 +31,7 @@ setup(
             'my_robot_wallfollower_holonomic_exec = my_robot_control.my_robot_wallfollower_holonomic:main',
             'my_robot_wallfollower_holonomic_improved_exec = my_robot_control.my_robot_wallfollower_holonomic_improved:main',
             'my_robot_wallfollower_holonomic_obstacle_exec = my_robot_control.my_robot_wallfollower_holonomic_obstacle:main',
+            'my_robot_wallfollower_holonomic_obstacle_aitana_exec = my_robot_control.my_robot_wallfollower_holonomic_obstacle_aitana:main',
             'my_robot_go2pose_exec = my_robot_control.my_robot_go2pose:main',
             'my_robot_set_pose_gazebo_exec = my_robot_control.my_robot_set_pose_gazebo:main',
         ],

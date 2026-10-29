@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="group2_custom">
+
+    <physics name="default_physics" type="ode">
+        <max_step_size>0.005</max_step_size>
+        <real_time_factor>1.0</real_time_factor>
+        <real_time_update_rate>200</real_time_update_rate>
+    </physics>
+
+    <!-- Core Ignition systems (Fortress / Gazebo6) -->
+    <plugin filename="libignition-gazebo6-physics-system.so"
+            name="ignition::gazebo::systems::Physics"/>
+
+    <plugin filename="libignition-gazebo6-user-commands-system.so"
+            name="ignition::gazebo::systems::UserCommands"/>
+
+    <plugin filename="libignition-gazebo6-scene-broadcaster-system.so"
+            name="ignition::gazebo::systems::SceneBroadcaster"/>
+
+    <plugin filename="libignition-gazebo6-sensors-system.so"
+            name="ignition::gazebo::systems::Sensors">
+        <render_engine>ogre2</render_engine>        
+    </plugin>
+
+    <!-- Scene configuration -->
+    <scene>
+      <ambient>0.6 0.6 0.6 1</ambient>
+      <background>0.8 0.8 0.8 1</background>
+      <shadows>false</shadows>
+      <grid>true</grid>
+    </scene>
+
+    <!-- Sun light -->
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Gazebo Fortress GUI -->
+    <gui fullscreen="0">
+      <plugin filename="MinimalScene" name="3D View">
+        <gz-gui>
+          <title>3D View</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <camera_pose>0 0 2.5 0 1.5708 0</camera_pose>
+      </plugin>
+
+      <plugin filename="GzSceneManager" name="Scene Manager">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="InteractiveViewControl" name="Interactive view control">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="CameraTracking" name="Camera Tracking">
+        <gz-gui>
+          <property key="width" type="double">1</property>
+          <property key="height" type="double">1</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="ComponentInspector" name="Component inspector"/>
+      <plugin filename="EntityTree" name="Entity tree"/>
+    </gui>
+
+    <!-- Models -->
+    <!-- Here, we add all the models using <include> to create the world. -->
+    <!-- We are going to create a square area measuring 3.6 x 3.6 m, centered at the same point as in the example (0.7, 0), but this time using six walls, each 60 cm long, on each side. -->
+    <!-- The walls along the y-axis have a yaw of 1.57 rad. -->
+
+    <!-- Superior side -->
+    <!-- Wall60cm 1 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_1</name>
+    <pose> -0.8 1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 2 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_2</name>
+    <pose> -0.2 1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 3 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_3</name>
+    <pose> 0.4 1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 4 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_4</name>
+    <pose> 1 1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 5 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_5</name>
+    <pose> 1.6 1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 6 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_6</name>
+    <pose> 2.2 1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Inferior side -->
+    <!-- Wall60cm 7 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_7</name>
+    <pose> -0.8 -1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 8 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_8</name>
+    <pose> -0.2 -1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 9 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_9</name>
+    <pose> 0.4 -1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 10 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_10</name>
+    <pose> 1 -1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 11 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_11</name>
+    <pose> 1.6 -1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Wall60cm 12 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_12</name>
+    <pose> 2.2 -1.8 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Right side -->
+    <!-- Wall60cm 13 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_13</name>
+    <pose> 2.5 -1.5 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 14 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_14</name>
+    <pose> 2.5 -0.9 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 15 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_15</name>
+    <pose> 2.5 -0.3 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 16 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_16</name>
+    <pose> 2.5 0.3 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 17 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_17</name>
+    <pose> 2.5 0.9 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 18 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_18</name>
+    <pose> 2.5 1.5 0.15 0 0 1.57</pose>
+    </include>
+
+    
+    <!-- Left side -->
+    <!-- Wall60cm 19 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_19</name>
+    <pose> -1.1 -1.5 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 20 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_20</name>
+    <pose> -1.1 -0.9 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 21 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_21</name>
+    <pose> -1.1 -0.3 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 22 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_22</name>
+    <pose> -1.1 0.3 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 23 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_23</name>
+    <pose> -1.1 0.9 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Wall60cm 24 -->
+    <include>
+    <uri>model://wall60cm</uri>
+    <name>wall60_24</name>
+    <pose> -1.1 1.5 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- Obstacle -->
+    <!-- The obstacle extends along the x-axis from 0.6 to 1.5 m and along the y-axis from 0 to 0.9 m, allowing the robot to pass through the entire space with margins greater than 0.9 m. -->
+    <!-- A wall90cm 1 -->
+    <include>
+    <uri>model://wall90cm</uri>
+    <name>wall90_1</name>
+    <pose>0.6 0.45 0.15 0 0 1.57</pose>
+    </include>
+
+    <!-- A wall90cm 2 -->
+    <include>
+    <uri>model://wall90cm</uri>
+    <name>wall90_2</name>
+    <pose>1.05 0 0.15 0 0 0</pose>
+    </include>
+
+    <!-- Stop Sign -->
+    <include>
+    <uri>model://sign_stop_ign</uri>
+    <name>sign_stop_1</name>
+    <pose>0.5 0 0 0 0 1.57</pose>
+    </include>
+
+
+
+
+    </world>
+
+</sdf>
