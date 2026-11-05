@@ -160,12 +160,12 @@ controller_server:
       max_vel_theta: 1.6
 
       min_speed_xy: 0.0
-      max_speed_xy: 0.50
+      max_speed_xy: 0.30
       min_speed_theta: 0.10
 
-      acc_lim_x: 2.0
-      acc_lim_y: 2.0
-      acc_lim_theta: 3.0
+      acc_lim_x: 1.0
+      acc_lim_y: 1.0
+      acc_lim_theta: 2.0
       decel_lim_x: -2.0
       decel_lim_y: -2.0
       decel_lim_theta: -3.0
