@@ -1,9 +1,33 @@
 traffic_sign_navigation:
   ros__parameters:
     use_sim_time: false
+
+    # x = endavant, y = esquerra (des de la posicio inicial del robot), yaw en radians
     initial_pose: [0.0, 0.0, 0.0]
-    inspection_pose: [0.5, 0.0, 0.0]
-    left_waypoint: [1.0, 0.5, 0.0]
-    right_waypoint: [1.0, -0.5, 0.0]
-    final_pose: [3.0, 0.0, 1.57]
-    stop_duration: 3.0
+
+    # Senyal 1 (prohibit girar a la dreta -> left)
+    inspection_pose: [0.3, 0.0, 0.0]
+    left_waypoint: [0.7, 0.5, 0.0]
+    right_waypoint: [0.7, -0.35, 0.0]
+
+    # Punt de gir al fons (el robot es gira cap a la sortida)
+    turn_pose: [2.5, 0.25, 3.14]
+
+    # Senyal 2 (prohibit girar a l'esquerra -> right), mirant cap a l'inici
+    inspection_pose_2: [1.95, 0.0, 3.14]
+    left_waypoint_2: [0.7, -0.35, 3.14]
+    right_waypoint_2: [0.7, 0.5, 3.14]
+
+    final_pose: [0.0, 0.0, 0.0]
+
+    two_signs: true
+    stop_duration: 2.0
+    sign_settle_time: 2.0
+  #ros__parameters:
+    #use_sim_time: false
+    #initial_pose: [0.0, 0.0, 0.0]
+    #inspection_pose: [0.5, 0.0, 0.0]
+    #left_waypoint: [1.0, 0.5, 0.0]
+    #right_waypoint: [0.7, -0.5, 0.0]
+    #final_pose: [3.0, 0.0, 1.57]
+    #stop_duration: 2.0
